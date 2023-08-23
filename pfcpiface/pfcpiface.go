@@ -137,8 +137,8 @@ func PushPFCPInfo(ip string) error {
 	if err != nil {
 		return err
 	}
-
-	conn, err := reuse.Dial("udp", ip, "upf"+":"+PFCPPort)
+	fmt.Println(ip)
+	conn, err := reuse.Dial("tcp", ip, "upf"+":8081")
 	if err != nil {
 		log.Errorln("dial socket failed", err)
 	}
