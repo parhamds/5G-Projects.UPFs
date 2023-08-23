@@ -138,7 +138,7 @@ func PushPFCPInfo(lAddr string) error {
 	var err error
 
 	for !done {
-		conn, err = reuse.Dial("tcp", lAddr, "upf-http:8081")
+		conn, err = reuse.Dial("tcp", lAddr, "upf:8806")
 		if err != nil {
 			log.Errorln("dial socket failed", err)
 			time.Sleep(1 * time.Second)
