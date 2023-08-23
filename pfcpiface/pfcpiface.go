@@ -142,6 +142,7 @@ func PushPFCPInfo(ip string) error {
 	if err != nil {
 		log.Errorln("dial socket failed", err)
 	}
+	time.Sleep(30 * time.Second)
 	fmt.Println("send pfcp info from:", conn.LocalAddr(), "to:", conn.RemoteAddr())
 	_, err = http.Post("http://upf:8081/v1/register/pcfp", "application/json", bytes.NewBuffer(rawpfcpinfo))
 	if err != nil {
