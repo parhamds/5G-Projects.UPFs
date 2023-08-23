@@ -56,7 +56,7 @@ func NewPFCPIface(conf Conf) *PFCPIface {
 		pfcpIface.fp = &bess{}
 	}
 
-	httpPort := "8080"
+	httpPort := "8081"
 	if conf.CPIface.HTTPPort != "" {
 		httpPort = conf.CPIface.HTTPPort
 	}
@@ -119,8 +119,7 @@ func (p *PFCPIface) Run() {
 		log.Infof("System call received: %+v", oscall)
 		p.Stop()
 	}()
-	lAddr := p.node.LocalAddr().String()
-	PushPFCPInfo(lAddr)
+	PushPFCPInfo()
 	// blocking
 	p.node.Serve()
 }
@@ -129,22 +128,24 @@ type PfcpInfo struct {
 	Ip string `json:"ip"`
 }
 
-func PushPFCPInfo(ip string) error {
+func PushPFCPInfo() error {
+	time.Sleep(30 * time.Second)
+	conn, err := reuse.Dial("tcp", "[::]:8081", "upf:8081")
+	if err != nil {
+		log.Errorln("dial socket failed", err)
+	}
+
+	fmt.Println("parham log : local address = ", conn.LocalAddr().String())
 	pfcpinfo := PfcpInfo{
-		Ip: ip,
+		Ip: conn.LocalAddr().String(),
 	}
 	rawpfcpinfo, err := json.Marshal(pfcpinfo)
 	if err != nil {
 		return err
 	}
-	fmt.Println(ip)
-	conn, err := reuse.Dial("tcp", ip, "upf"+":8081")
-	if err != nil {
-		log.Errorln("dial socket failed", err)
-	}
-	time.Sleep(30 * time.Second)
+
 	fmt.Println("send pfcp info from:", conn.LocalAddr(), "to:", conn.RemoteAddr())
-	_, err = http.Post("http://upf:8081/v1/register/pcfp", "application/json", bytes.NewBuffer(rawpfcpinfo))
+	_, err = http.Post("upf:8081/v1/register/pcfp", "application/json", bytes.NewBuffer(rawpfcpinfo))
 	if err != nil {
 		return err
 	}

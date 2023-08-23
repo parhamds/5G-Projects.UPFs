@@ -6,6 +6,12 @@ package integration
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
+	"net"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/omec-project/pfcpsim/pkg/pfcpsim"
 	"github.com/omec-project/upf-epc/internal/p4constants"
 	"github.com/omec-project/upf-epc/pfcpiface"
@@ -16,11 +22,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"github.com/wmnsk/go-pfcp/ie"
-	"io/ioutil"
-	"net"
-	"os"
-	"testing"
-	"time"
 )
 
 // this file should contain all the struct defs/constants used among different test cases.
@@ -320,7 +321,7 @@ func MustStopMockUP4() {
 
 func MustStartPFCPAgent() {
 	providers.MustRunDockerContainer(ContainerNamePFCPAgent, ImageNamePFCPAgent, "-config /config/upf.json",
-		[]string{"8805/udp", "8080/tcp"}, "/tmp:/config", DockerTestNetwork)
+		[]string{"8805/udp", "8081/tcp"}, "/tmp:/config", DockerTestNetwork)
 }
 
 func MustStopPFCPAgent() {
