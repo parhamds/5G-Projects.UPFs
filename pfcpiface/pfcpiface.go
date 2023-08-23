@@ -132,7 +132,7 @@ type PfcpInfo struct {
 
 func PushPFCPInfo(lAddr string) error {
 	//time.Sleep(15 * time.Second)
-	conn, err := reuse.Dial("tcp", lAddr, "upf:8081")
+	conn, err := reuse.Dial("tcp", lAddr, "upf-http:8081")
 	if err != nil {
 		log.Errorln("dial socket failed", err)
 	}
