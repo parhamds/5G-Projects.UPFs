@@ -6,7 +6,7 @@ set -ex
 # TCP port of bess/web monitor
 gui_port=8000
 bessd_port=10514
-metrics_port=8081
+metrics_port=8080
 
 # Driver options. Choose any one of the three
 #

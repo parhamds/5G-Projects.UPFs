@@ -321,7 +321,7 @@ func MustStopMockUP4() {
 
 func MustStartPFCPAgent() {
 	providers.MustRunDockerContainer(ContainerNamePFCPAgent, ImageNamePFCPAgent, "-config /config/upf.json",
-		[]string{"8805/udp", "8081/tcp"}, "/tmp:/config", DockerTestNetwork)
+		[]string{"8805/udp", "8080/tcp"}, "/tmp:/config", DockerTestNetwork)
 }
 
 func MustStopPFCPAgent() {
