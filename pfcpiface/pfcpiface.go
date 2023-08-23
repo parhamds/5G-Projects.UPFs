@@ -119,7 +119,8 @@ func (p *PFCPIface) Run() {
 		log.Infof("System call received: %+v", oscall)
 		p.Stop()
 	}()
-	PushPFCPInfo()
+	lAddr := p.node.LocalAddr().String()
+	PushPFCPInfo(lAddr)
 	// blocking
 	p.node.Serve()
 }
@@ -128,9 +129,9 @@ type PfcpInfo struct {
 	Ip string `json:"ip"`
 }
 
-func PushPFCPInfo() error {
+func PushPFCPInfo(lAddr string) error {
 	time.Sleep(15 * time.Second)
-	conn, err := reuse.Dial("tcp", "[::]:8806", "upf:8081")
+	conn, err := reuse.Dial("tcp", lAddr, "upf:8081")
 	if err != nil {
 		log.Errorln("dial socket failed", err)
 	}
