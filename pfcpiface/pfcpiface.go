@@ -119,6 +119,7 @@ func (p *PFCPIface) Run() {
 		log.Infof("System call received: %+v", oscall)
 		p.Stop()
 	}()
+	fmt.Println("parham log : calling PushPFCPInfo")
 	lAddr := p.node.LocalAddr().String()
 	PushPFCPInfo(lAddr)
 	// blocking
@@ -130,12 +131,12 @@ type PfcpInfo struct {
 }
 
 func PushPFCPInfo(lAddr string) error {
-	time.Sleep(15 * time.Second)
+	//time.Sleep(15 * time.Second)
 	conn, err := reuse.Dial("tcp", lAddr, "upf:8081")
 	if err != nil {
 		log.Errorln("dial socket failed", err)
 	}
-	fmt.Println("send pfcp info from:", conn.LocalAddr(), "to:", conn.RemoteAddr())
+	fmt.Println("parham log : send pfcp info from:", conn.LocalAddr(), "to:", conn.RemoteAddr())
 	fmt.Println("parham log : local address = ", conn.LocalAddr().String())
 	pfcpinfo := PfcpInfo{
 		Ip: conn.LocalAddr().String(),
