@@ -10,6 +10,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -132,9 +133,18 @@ type PfcpInfo struct {
 
 func PushPFCPInfo(lAddr string) error {
 	time.Sleep(15 * time.Second)
-	conn, err := reuse.Dial("tcp", lAddr, "upf-http:8081")
-	if err != nil {
-		log.Errorln("dial socket failed", err)
+	done := false
+	var conn net.Conn
+	var err error
+
+	for !done {
+		conn, err = reuse.Dial("tcp", lAddr, "upf-http:8081")
+		if err != nil {
+			log.Errorln("dial socket failed", err)
+			time.Sleep(1 * time.Second)
+		} else {
+			done = true
+		}
 	}
 	fmt.Println("parham log : send pfcp info from:", conn.LocalAddr(), "to:", conn.RemoteAddr())
 	fmt.Println("parham log : local address = ", conn.LocalAddr().String())
