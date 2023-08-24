@@ -206,11 +206,11 @@ func PushPFCPInfoNew() {
 			time.Sleep(1 * time.Second)
 		} else {
 			done = true
-
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				log.Errorf("error reading http respose: %s\n", err)
 			} else {
+				fmt.Println("parham log : resp header = ", resp)
 				fmt.Println("parham log : resp body = ", string(body))
 			}
 
