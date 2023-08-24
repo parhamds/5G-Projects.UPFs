@@ -200,6 +200,7 @@ func PushPFCPInfoNew() {
 		_, err = client.Do(req)
 		if err != nil {
 			log.Errorf("client: error making http request: %s\n", err)
+			time.Sleep(1 * time.Second)
 		} else {
 			done = true
 		}
