@@ -180,7 +180,7 @@ func PushPFCPInfoNew() {
 	fmt.Printf("parham log : json encoded pfcpInfo [%s] ", pfcpInfoJson)
 
 	// change the IP here
-	requestURL := "http://upf-http:8081/v1/register/pcfp"
+	requestURL := "http://upf-http:8080/v1/register/pcfp"
 	jsonBody := []byte(pfcpInfoJson)
 
 	bodyReader := bytes.NewReader(jsonBody)
