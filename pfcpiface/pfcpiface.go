@@ -211,7 +211,7 @@ func PushPFCPInfoNew() {
 			if err != nil {
 				log.Errorf("error reading http respose: %s\n", err)
 			} else {
-				fmt.Println("parham log : resp body = "string(body))
+				fmt.Println("parham log : resp body = ", string(body))
 			}
 
 			return
