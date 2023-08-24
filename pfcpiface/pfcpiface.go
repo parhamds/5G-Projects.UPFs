@@ -209,13 +209,16 @@ func PushPFCPInfoNew() {
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
-				fmt.Println(string(body))
+				log.Errorf("error reading http respose: %s\n", err)
+			} else {
+				fmt.Println("parham log : resp body = "string(body))
 			}
+
+			return
 		}
 	}
 	// waiting for http response
 
-	return
 }
 
 // GetLocalIP returns ip of first non loopback interface in string
