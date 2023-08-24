@@ -181,7 +181,7 @@ func PushPFCPInfoNew() {
 	fmt.Printf("parham log : json encoded pfcpInfo [%s] ", pfcpInfoJson)
 
 	// change the IP here
-	requestURL := "http://upf-http.omec.svc.cluster.local:8080/v1/register/pcfp"
+	requestURL := "http://upf-http:8080/v1/register/pcfp"
 	jsonBody := []byte(pfcpInfoJson)
 
 	bodyReader := bytes.NewReader(jsonBody)
@@ -195,8 +195,8 @@ func PushPFCPInfoNew() {
 	client := http.Client{
 		Timeout: 10 * time.Second,
 	}
-	upfhttpIP := net.ParseIP("upf.omec.svc.cluster.local")
-	upfIP := net.ParseIP("upf-http.omec.svc.cluster.local")
+	upfhttpIP := net.ParseIP("upf")
+	upfIP := net.ParseIP("upf-http")
 	fmt.Println("parham log : ip of upfIP and upfhttpIP =", upfIP, upfhttpIP)
 	done := false
 	for !done {
