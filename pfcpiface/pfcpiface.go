@@ -120,9 +120,11 @@ func (p *PFCPIface) Run() {
 		log.Infof("System call received: %+v", oscall)
 		p.Stop()
 	}()
-	fmt.Println("parham log : calling PushPFCPInfo")
-	lAddr := p.node.LocalAddr().String()
-	PushPFCPInfo(lAddr)
+	//fmt.Println("parham log : calling PushPFCPInfo")
+	//lAddr := p.node.LocalAddr().String()
+	//PushPFCPInfo(lAddr)
+	fmt.Println("parham log : calling PushPFCPInfoNew")
+	PushPFCPInfoNew()
 	// blocking
 	p.node.Serve()
 }
@@ -163,6 +165,65 @@ func PushPFCPInfo(lAddr string) error {
 	fmt.Println("parham log : pfcp added to pfcplb")
 
 	return nil
+}
+
+func PushPFCPInfoNew() {
+
+	// get IP
+	ip_str := GetLocalIP()
+	pfcpInfo := &PfcpInfo{
+		Ip: ip_str,
+	}
+	fmt.Println("parham log : local ip = ", ip_str)
+	pfcpInfoJson, _ := json.Marshal(pfcpInfo)
+
+	fmt.Printf("parham log : json encoded pfcpInfo [%s] ", pfcpInfoJson)
+
+	// change the IP here
+	requestURL := "http://upf-http:8081/v1/register/pcfp"
+	jsonBody := []byte(pfcpInfoJson)
+
+	bodyReader := bytes.NewReader(jsonBody)
+	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+	if err != nil {
+		log.Errorf("client: could not create request: %s\n", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	done := false
+	for !done {
+		_, err = client.Do(req)
+		if err != nil {
+			log.Errorf("client: error making http request: %s\n", err)
+		} else {
+			done = true
+		}
+	}
+	// waiting for http response
+
+	return
+}
+
+// GetLocalIP returns ip of first non loopback interface in string
+func GetLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ""
+	}
+	for _, address := range addrs {
+		// check the address type and if it is not a loopback the display it
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return ""
 }
 
 // Stop sends cancellation signal to main Go routine and waits for shutdown to complete.
