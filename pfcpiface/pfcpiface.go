@@ -194,7 +194,9 @@ func PushPFCPInfoNew() {
 	client := http.Client{
 		Timeout: 10 * time.Second,
 	}
-
+	upfhttpIP := net.ParseIP("upf")
+	upfIP := net.ParseIP("upf-http")
+	fmt.Println("parham log : ip of upfIP and upfhttpIP =", upfIP, upfhttpIP)
 	done := false
 	for !done {
 		_, err = client.Do(req)
