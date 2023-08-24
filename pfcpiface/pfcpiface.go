@@ -10,6 +10,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -199,12 +200,17 @@ func PushPFCPInfoNew() {
 	fmt.Println("parham log : ip of upfIP and upfhttpIP =", upfIP, upfhttpIP)
 	done := false
 	for !done {
-		_, err = client.Do(req)
+		resp, err := client.Do(req)
 		if err != nil {
 			log.Errorf("client: error making http request: %s\n", err)
 			time.Sleep(1 * time.Second)
 		} else {
 			done = true
+
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				fmt.Println(string(body))
+			}
 		}
 	}
 	// waiting for http response
