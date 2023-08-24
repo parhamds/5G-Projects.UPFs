@@ -10,7 +10,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"os"
@@ -195,9 +194,9 @@ func PushPFCPInfoNew() {
 	client := http.Client{
 		Timeout: 10 * time.Second,
 	}
-	upfhttpIP := net.ParseIP("upf")
-	upfIP := net.ParseIP("upf-http")
-	fmt.Println("parham log : ip of upfIP and upfhttpIP =", upfIP, upfhttpIP)
+	//upfhttpIP := net.ParseIP("upf")
+	//upfIP := net.ParseIP("upf-http")
+	//fmt.Println("parham log : ip of upfIP and upfhttpIP =", upfIP, upfhttpIP)
 	done := false
 	for !done {
 		resp, err := client.Do(req)
@@ -206,12 +205,12 @@ func PushPFCPInfoNew() {
 			time.Sleep(1 * time.Second)
 		} else {
 			done = true
-			body, err := io.ReadAll(resp.Body)
+			//body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				log.Errorf("error reading http respose: %s\n", err)
 			} else {
 				fmt.Println("parham log : resp header = ", resp.Header)
-				fmt.Println("parham log : resp body = ", string(body))
+				fmt.Println("parham log : resp status = ", resp.Status)
 			}
 
 			return
