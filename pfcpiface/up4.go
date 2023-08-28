@@ -110,9 +110,9 @@ type UP4 struct {
 	host            string
 	deviceID        uint64
 	timeout         uint32
-	accessIP        *net.IPNet
+	AccessIP        *net.IPNet
 	ueIPPool        *net.IPNet
-	enableEndMarker bool
+	EnableEndMarker bool
 
 	p4client *P4rtClient
 
@@ -389,7 +389,7 @@ func (up4 *UP4) initApplicationIDs() {
 // This function ensures that PFCP Agent is connected to UP4.
 // Returns true if the connection is already established.
 // FIXME: the argument should be removed from datapath API
-func (up4 *UP4) IsConnected(accessIP *net.IP) bool {
+func (up4 *UP4) IsConnected(AccessIP *net.IP) bool {
 	up4.connectedMu.Lock()
 	defer up4.connectedMu.Unlock()
 
@@ -409,10 +409,10 @@ func (up4 *UP4) SetUpfInfo(u *upf, conf *Conf) {
 
 	up4.conf = conf.P4rtcIface
 
-	up4.accessIP = MustParseStrIP(conf.P4rtcIface.AccessIP)
-	u.accessIP = up4.accessIP.IP
+	up4.AccessIP = MustParseStrIP(conf.P4rtcIface.AccessIP)
+	u.AccessIP = up4.AccessIP.IP
 
-	log.Infof("AccessIP: %v", up4.accessIP)
+	log.Infof("AccessIP: %v", up4.AccessIP)
 
 	up4.ueIPPool = MustParseStrIP(conf.CPIface.UEIPPool)
 
@@ -421,7 +421,7 @@ func (up4 *UP4) SetUpfInfo(u *upf, conf *Conf) {
 	p4rtcServer := conf.P4rtcIface.P4rtcServer
 
 	p4rtcPort := conf.P4rtcIface.P4rtcPort
-	up4.reportNotifyChan = u.reportNotifyChan
+	up4.reportNotifyChan = u.ReportNotifyChan
 
 	if *p4RtcServerIP != "" {
 		p4rtcServer = *p4RtcServerIP
@@ -431,7 +431,7 @@ func (up4 *UP4) SetUpfInfo(u *upf, conf *Conf) {
 		p4rtcPort = *p4RtcServerPort
 	}
 
-	u.coreIP = net.ParseIP(net.IPv4zero.String())
+	u.CoreIP = net.ParseIP(net.IPv4zero.String())
 
 	up4.host = p4rtcServer + ":" + p4rtcPort
 
@@ -441,7 +441,7 @@ func (up4 *UP4) SetUpfInfo(u *upf, conf *Conf) {
 
 	up4.deviceID = 1
 	up4.timeout = 30
-	up4.enableEndMarker = conf.EnableEndMarker
+	up4.EnableEndMarker = conf.EnableEndMarker
 	up4.initTunnelPeerIDs()
 	up4.initApplicationIDs()
 	up4.meters = make(map[meterID]meter)
@@ -523,7 +523,7 @@ func (up4 *UP4) initInterfaces() error {
 
 	entries = append(entries, uePoolEntry)
 
-	n3AddrEntry, err := up4.p4RtTranslator.BuildInterfaceTableEntry(up4.accessIP, up4.conf.SliceID, false)
+	n3AddrEntry, err := up4.p4RtTranslator.BuildInterfaceTableEntry(up4.AccessIP, up4.conf.SliceID, false)
 	if err != nil {
 		return err
 	}
@@ -535,7 +535,7 @@ func (up4 *UP4) initInterfaces() error {
 	}
 
 	log.WithFields(log.Fields{
-		"N3 address": up4.accessIP,
+		"N3 address": up4.AccessIP,
 		"ue pool":    up4.ueIPPool,
 	}).Debug("N3 address and UE pool successfully initialized in the UP4 pipeline")
 
@@ -592,7 +592,7 @@ func (up4 *UP4) initialize(shouldClear bool) error {
 	up4.initOnce.Do(func() {
 		go up4.listenToDDNs()
 
-		if up4.enableEndMarker {
+		if up4.EnableEndMarker {
 			log.Println("Starting end marker loop")
 
 			up4.endMarkerChan = make(chan []byte, 1024)
@@ -695,7 +695,7 @@ func (up4 *UP4) addOrUpdateGTPTunnelPeer(far far) error {
 
 	methodType := p4.Update_MODIFY
 	tunnelParams := tunnelParams{
-		tunnelIP4Src: ip2int(up4.accessIP.IP),
+		tunnelIP4Src: ip2int(up4.AccessIP.IP),
 		tunnelIP4Dst: far.tunnelIP4Dst,
 		tunnelPort:   far.tunnelPort,
 	}
@@ -754,7 +754,7 @@ func (up4 *UP4) removeGTPTunnelPeer(far far) {
 		"far": far,
 	})
 	tunnelParams := tunnelParams{
-		tunnelIP4Src: ip2int(up4.accessIP.IP),
+		tunnelIP4Src: ip2int(up4.AccessIP.IP),
 		tunnelIP4Dst: far.tunnelIP4Dst,
 		tunnelPort:   far.tunnelPort,
 	}
@@ -1332,7 +1332,7 @@ func (up4 *UP4) modifyUP4ForwardingConfiguration(pdrs []pdr, allFARs []far, qers
 		pdrLog.Debug("Found related FAR for PDR")
 
 		tunnelParams := tunnelParams{
-			tunnelIP4Src: ip2int(up4.accessIP.IP),
+			tunnelIP4Src: ip2int(up4.AccessIP.IP),
 			tunnelIP4Dst: far.tunnelIP4Dst,
 			tunnelPort:   far.tunnelPort,
 		}

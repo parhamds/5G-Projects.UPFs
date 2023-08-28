@@ -33,7 +33,7 @@ func (pConn *PFCPConn) sendAssociationRequest() {
 			return
 		}
 
-		if pConn.upf.enableHBTimer {
+		if pConn.upf.EnableHBTimer {
 			go pConn.startHeartBeatMonitor()
 		}
 	} else if timeout {
@@ -59,7 +59,7 @@ func (pConn *PFCPConn) handleHeartbeatRequest(msg message.Message) (message.Mess
 		return nil, errUnmarshal(errMsgUnexpectedType)
 	}
 
-	if pConn.upf.enableHBTimer {
+	if pConn.upf.EnableHBTimer {
 		// reset heartbeat expiry timer
 		// non-blocking write to channel
 		select {
@@ -92,22 +92,22 @@ func (pConn *PFCPConn) handleIncomingResponse(msg message.Message) {
 
 func (pConn *PFCPConn) associationIEs() []*ie.IE {
 	upf := pConn.upf
-	networkInstance := string(ie.NewNetworkInstanceFQDN(upf.dnn).Payload)
+	networkInstance := string(ie.NewNetworkInstanceFQDN(upf.Dnn).Payload)
 	flags := uint8(0x41)
 
-	if len(upf.dnn) != 0 {
-		log.Infoln("Association Setup with DNN:", upf.dnn)
+	if len(upf.Dnn) != 0 {
+		log.Infoln("Association Setup with DNN:", upf.Dnn)
 		// add ASSONI flag to set network instance.
 		flags = uint8(0x61)
 	}
 
 	features := make([]uint8, 4)
 
-	if upf.enableUeIPAlloc {
+	if upf.EnableUeIPAlloc {
 		setUeipFeature(features...)
 	}
 
-	if upf.enableEndMarker {
+	if upf.EnableEndMarker {
 		setEndMarkerFeature(features...)
 	}
 
@@ -116,8 +116,8 @@ func (pConn *PFCPConn) associationIEs() []*ie.IE {
 		pConn.nodeID.localIE,
 		// 0x41 = Spare (0) | Assoc Src Inst (1) | Assoc Net Inst (0) | Tied Range (000) | IPV6 (0) | IPV4 (1)
 		//      = 01000001
-		ie.NewUserPlaneIPResourceInformation(flags, 0, upf.accessIP.String(), "", networkInstance, ie.SrcInterfaceAccess),
-		// ie.NewUserPlaneIPResourceInformation(0x41, 0, coreIP, "", "", ie.SrcInterfaceCore),
+		ie.NewUserPlaneIPResourceInformation(flags, 0, upf.AccessIP.String(), "", networkInstance, ie.SrcInterfaceAccess),
+		// ie.NewUserPlaneIPResourceInformation(0x41, 0, CoreIP, "", "", ie.SrcInterfaceCore),
 		ie.NewUPFunctionFeatures(features...),
 	}
 

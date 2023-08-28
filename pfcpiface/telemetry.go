@@ -134,7 +134,7 @@ func (col PfcpNodeCollector) Describe(ch chan<- *prometheus.Desc) {
 }
 
 func (col PfcpNodeCollector) Collect(ch chan<- prometheus.Metric) {
-	if col.node.upf.enableFlowMeasure {
+	if col.node.upf.EnableFlowMeasure {
 		err := col.node.upf.SessionStats(&col, ch)
 		if err != nil {
 			log.Errorln(err)

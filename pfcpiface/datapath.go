@@ -47,7 +47,7 @@ type datapath interface {
 	// TODO: we should have better CRUD API, with a single function per message type.
 	SendMsgToUPF(method upfMsgType, all PacketForwardingRules, new PacketForwardingRules) uint8
 	/* check of communication channel to datapath is setup */
-	IsConnected(accessIP *net.IP) bool
+	IsConnected(AccessIP *net.IP) bool
 	SummaryLatencyJitter(uc *upfCollector, ch chan<- prometheus.Metric)
 	PortStats(uc *upfCollector, ch chan<- prometheus.Metric)
 	SessionStats(pc *PfcpNodeCollector, ch chan<- prometheus.Metric) error

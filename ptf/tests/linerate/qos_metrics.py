@@ -44,7 +44,7 @@ class PerFlowQosMetricsTest(TrexTest, GrpcTest):
         startIP = IPv4Address('16.0.0.1')
         endIP = startIP + UE_COUNT - 1
 
-        accessIP = IPv4Address('10.128.13.29')
+        AccessIP = IPv4Address('10.128.13.29')
         enbIP = IPv4Address('10.27.19.99') # arbitrary ip for non-existent eNodeB for gtpu encap
 
         # program UPF for downlink traffic by installing PDRs and FARs
@@ -72,7 +72,7 @@ class PerFlowQosMetricsTest(TrexTest, GrpcTest):
                 applyAction = ACTION_FORWARD,
                 dstIntf = DST_ACCESS,
                 tunnelType = 0x1,
-                tunnelIP4Src = int(accessIP),
+                tunnelIP4Src = int(AccessIP),
                 tunnelIP4Dst = int(enbIP), # only one eNB to send to downlink
                 tunnelTEID = 0,
                 tunnelPort = GTPU_PORT,

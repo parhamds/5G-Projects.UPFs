@@ -59,7 +59,7 @@ func NewPFCPNode(upf *upf) *PFCPNode {
 }
 
 func (node *PFCPNode) tryConnectToN4Peers(lAddrStr string) {
-	for _, peer := range node.upf.peers {
+	for _, peer := range node.upf.Peers {
 		conn, err := net.Dial("udp", peer+":"+PFCPPort)
 		if err != nil {
 			log.Warnln("Failed to establish PFCP connection to peer ", peer)
@@ -119,7 +119,7 @@ func (node *PFCPNode) Serve() {
 
 	for !shutdown {
 		select {
-		case fseid := <-node.upf.reportNotifyChan:
+		case fseid := <-node.upf.ReportNotifyChan:
 			// TODO: Logic to distinguish PFCPConn based on SEID
 			node.pConns.Range(func(key, value interface{}) bool {
 				pConn := value.(*PFCPConn)

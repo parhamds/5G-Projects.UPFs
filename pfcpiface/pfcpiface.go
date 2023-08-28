@@ -125,10 +125,10 @@ func (p *PFCPIface) Run() {
 	//PushPFCPInfo(lAddr)
 	fmt.Println("parham log : calling PushPFCPInfoNew")
 	fmt.Println("upf info before calling PushPFCPInfoNew :")
-	fmt.Println("dnn = ", p.node.upf.dnn)
-	fmt.Println("accessIP = ", p.node.upf.accessIP)
-	fmt.Println("coreIP = ", p.node.upf.coreIP)
-	fmt.Println("nodeID = ", p.node.upf.nodeID)
+	fmt.Println("dnn = ", p.node.upf.Dnn)
+	fmt.Println("AccessIP = ", p.node.upf.AccessIP)
+	fmt.Println("CoreIP = ", p.node.upf.CoreIP)
+	fmt.Println("nodeID = ", p.node.upf.NodeID)
 
 	PushPFCPInfoNew(p.node.upf)
 	// blocking
@@ -176,10 +176,10 @@ func PushPFCPInfo(lAddr string) error {
 
 func PushPFCPInfoNew(upf *upf) {
 	fmt.Println("upf info inside PushPFCPInfoNew :")
-	fmt.Println("dnn = ", upf.dnn)
-	fmt.Println("accessIP = ", upf.accessIP)
-	fmt.Println("coreIP = ", upf.coreIP)
-	fmt.Println("nodeID = ", upf.nodeID)
+	fmt.Println("dnn = ", upf.Dnn)
+	fmt.Println("AccessIP = ", upf.AccessIP)
+	fmt.Println("CoreIP = ", upf.CoreIP)
+	fmt.Println("nodeID = ", upf.NodeID)
 	// get IP
 	ip_str := GetLocalIP()
 	pfcpInfo := &PfcpInfo{

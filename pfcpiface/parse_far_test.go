@@ -29,7 +29,7 @@ func TestParseFAR(t *testing.T) {
 
 	var FSEID uint64 = 100
 
-	coreIP := net.ParseIP("10.0.10.1")
+	CoreIP := net.ParseIP("10.0.10.1")
 	UEAddressForDownlink := net.ParseIP("10.0.1.1")
 
 	for _, scenario := range []farTestCase{
@@ -65,7 +65,7 @@ func TestParseFAR(t *testing.T) {
 				dstIntf:      access,
 				tunnelTEID:   100,
 				tunnelType:   access,
-				tunnelIP4Src: ip2int(coreIP),
+				tunnelIP4Src: ip2int(CoreIP),
 				tunnelIP4Dst: ip2int(UEAddressForDownlink),
 				tunnelPort:   uint16(defaultGTPProtocolPort),
 			},
@@ -75,8 +75,8 @@ func TestParseFAR(t *testing.T) {
 		t.Run(scenario.description, func(t *testing.T) {
 			mockFar := &far{}
 			mockUpf := &upf{
-				accessIP: net.ParseIP("192.168.0.1"),
-				coreIP:   coreIP,
+				AccessIP: net.ParseIP("192.168.0.1"),
+				CoreIP:   CoreIP,
 			}
 
 			err := mockFar.parseFAR(scenario.input, FSEID, mockUpf, scenario.op)
@@ -142,8 +142,8 @@ func TestParseFARShouldError(t *testing.T) {
 		t.Run(scenario.description, func(t *testing.T) {
 			mockFar := &far{}
 			mockUpf := &upf{
-				accessIP: net.ParseIP("192.168.0.1"),
-				coreIP:   net.ParseIP("10.0.0.1"),
+				AccessIP: net.ParseIP("192.168.0.1"),
+				CoreIP:   net.ParseIP("10.0.0.1"),
 			}
 
 			err := mockFar.parseFAR(scenario.input, 101, mockUpf, scenario.op)

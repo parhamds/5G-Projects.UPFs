@@ -36,27 +36,27 @@ type UeResource struct {
 }
 
 type upf struct {
-	enableUeIPAlloc   bool
-	enableEndMarker   bool
-	enableFlowMeasure bool
-	accessIface       string
-	coreIface         string
-	ippoolCidr        string
-	accessIP          net.IP
-	coreIP            net.IP
-	nodeID            string
-	ippool            *IPPool
-	peers             []string
-	dnn               string
-	reportNotifyChan  chan uint64
-	sliceInfo         *SliceInfo
-	readTimeout       time.Duration
+	EnableUeIPAlloc   bool
+	EnableEndMarker   bool
+	EnableFlowMeasure bool
+	AccessIface       string
+	CoreIface         string
+	IppoolCidr        string
+	AccessIP          net.IP
+	CoreIP            net.IP
+	NodeID            string
+	Ippool            *IPPool
+	Peers             []string
+	Dnn               string
+	ReportNotifyChan  chan uint64
+	SliceInfo         *SliceInfo
+	ReadTimeout       time.Duration
 
 	datapath
-	maxReqRetries uint8
-	respTimeout   time.Duration
-	enableHBTimer bool
-	hbInterval    time.Duration
+	MaxReqRetries uint8
+	RespTimeout   time.Duration
+	EnableHBTimer bool
+	HbInterval    time.Duration
 }
 
 // to be replaced with go-pfcp structs
@@ -76,7 +76,7 @@ const (
 )
 
 func (u *upf) isConnected() bool {
-	return u.datapath.IsConnected(&u.accessIP)
+	return u.datapath.IsConnected(&u.AccessIP)
 }
 
 func (u *upf) addSliceInfo(sliceInfo *SliceInfo) error {
@@ -84,7 +84,7 @@ func (u *upf) addSliceInfo(sliceInfo *SliceInfo) error {
 		return ErrInvalidArgument("sliceInfo", sliceInfo)
 	}
 
-	u.sliceInfo = sliceInfo
+	u.SliceInfo = sliceInfo
 
 	return u.datapath.AddSliceInfo(sliceInfo)
 }
@@ -114,25 +114,25 @@ func NewUPF(conf *Conf, fp datapath) *upf {
 	}
 
 	u := &upf{
-		enableUeIPAlloc:   conf.CPIface.EnableUeIPAlloc,
-		enableEndMarker:   conf.EnableEndMarker,
-		enableFlowMeasure: conf.EnableFlowMeasure,
-		accessIface:       conf.AccessIface.IfName,
-		coreIface:         conf.CoreIface.IfName,
-		ippoolCidr:        conf.CPIface.UEIPPool,
-		nodeID:            nodeID,
+		EnableUeIPAlloc:   conf.CPIface.EnableUeIPAlloc,
+		EnableEndMarker:   conf.EnableEndMarker,
+		EnableFlowMeasure: conf.EnableFlowMeasure,
+		AccessIface:       conf.AccessIface.IfName,
+		CoreIface:         conf.CoreIface.IfName,
+		IppoolCidr:        conf.CPIface.UEIPPool,
+		NodeID:            nodeID,
 		datapath:          fp,
-		dnn:               conf.CPIface.Dnn,
-		peers:             conf.CPIface.Peers,
-		reportNotifyChan:  make(chan uint64, 1024),
-		maxReqRetries:     conf.MaxReqRetries,
-		enableHBTimer:     conf.EnableHBTimer,
-		readTimeout:       time.Second * time.Duration(conf.ReadTimeout),
+		Dnn:               conf.CPIface.Dnn,
+		Peers:             conf.CPIface.Peers,
+		ReportNotifyChan:  make(chan uint64, 1024),
+		MaxReqRetries:     conf.MaxReqRetries,
+		EnableHBTimer:     conf.EnableHBTimer,
+		ReadTimeout:       time.Second * time.Duration(conf.ReadTimeout),
 	}
 
 	if len(conf.CPIface.Peers) > 0 {
-		u.peers = make([]string, len(conf.CPIface.Peers))
-		nc := copy(u.peers, conf.CPIface.Peers)
+		u.Peers = make([]string, len(conf.CPIface.Peers))
+		nc := copy(u.Peers, conf.CPIface.Peers)
 
 		if nc == 0 {
 			log.Warnln("Failed to parse cpiface peers, PFCP Agent will not initiate connection to N4 peers.")
@@ -140,35 +140,35 @@ func NewUPF(conf *Conf, fp datapath) *upf {
 	}
 
 	if !conf.EnableP4rt {
-		u.accessIP, err = GetUnicastAddressFromInterface(conf.AccessIface.IfName)
+		u.AccessIP, err = GetUnicastAddressFromInterface(conf.AccessIface.IfName)
 		if err != nil {
 			log.Errorln(err)
 			return nil
 		}
 
-		u.coreIP, err = GetUnicastAddressFromInterface(conf.CoreIface.IfName)
+		u.CoreIP, err = GetUnicastAddressFromInterface(conf.CoreIface.IfName)
 		if err != nil {
 			log.Errorln(err)
 			return nil
 		}
 	}
 
-	u.respTimeout, err = time.ParseDuration(conf.RespTimeout)
+	u.RespTimeout, err = time.ParseDuration(conf.RespTimeout)
 	if err != nil {
 		log.Fatalln("Unable to parse resp_timeout")
 	}
 
-	if u.enableHBTimer {
+	if u.EnableHBTimer {
 		if conf.HeartBeatInterval != "" {
-			u.hbInterval, err = time.ParseDuration(conf.HeartBeatInterval)
+			u.HbInterval, err = time.ParseDuration(conf.HeartBeatInterval)
 			if err != nil {
 				log.Fatalln("Unable to parse heart_beat_interval")
 			}
 		}
 	}
 
-	if u.enableUeIPAlloc {
-		u.ippool, err = NewIPPool(u.ippoolCidr)
+	if u.EnableUeIPAlloc {
+		u.Ippool, err = NewIPPool(u.IppoolCidr)
 		if err != nil {
 			log.Fatalln("ip pool init failed", err)
 		}
@@ -176,10 +176,10 @@ func NewUPF(conf *Conf, fp datapath) *upf {
 
 	u.datapath.SetUpfInfo(u, conf)
 	fmt.Println("upf info :")
-	fmt.Println("dnn = ", u.dnn)
-	fmt.Println("accessIP = ", u.accessIP)
-	fmt.Println("coreIP = ", u.coreIP)
-	fmt.Println("nodeID = ", u.nodeID)
+	fmt.Println("dnn = ", u.Dnn)
+	fmt.Println("AccessIP = ", u.AccessIP)
+	fmt.Println("CoreIP = ", u.CoreIP)
+	fmt.Println("nodeID = ", u.NodeID)
 
 	return u
 }
