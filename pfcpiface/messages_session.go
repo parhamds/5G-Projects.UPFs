@@ -88,7 +88,7 @@ func (pConn *PFCPConn) handleSessionEstablishmentRequest(msg message.Message) (m
 
 	for _, cPDR := range sereq.CreatePDR {
 		var p pdr
-		if err := p.parsePDR(cPDR, session.localSEID, pConn.appPFDs, upf.Ippool); err != nil {
+		if err := p.parsePDR(cPDR, session.localSEID, pConn.appPFDs, upf.ippool); err != nil {
 			return errProcessReply(err, ie.CauseRequestRejected)
 		}
 
@@ -222,7 +222,7 @@ func (pConn *PFCPConn) handleSessionModificationRequest(msg message.Message) (me
 
 	for _, cPDR := range smreq.CreatePDR {
 		var p pdr
-		if err := p.parsePDR(cPDR, localSEID, pConn.appPFDs, upf.Ippool); err != nil {
+		if err := p.parsePDR(cPDR, localSEID, pConn.appPFDs, upf.ippool); err != nil {
 			return sendError(err)
 		}
 
@@ -262,7 +262,7 @@ func (pConn *PFCPConn) handleSessionModificationRequest(msg message.Message) (me
 			err error
 		)
 
-		if err = p.parsePDR(uPDR, localSEID, pConn.appPFDs, upf.Ippool); err != nil {
+		if err = p.parsePDR(uPDR, localSEID, pConn.appPFDs, upf.ippool); err != nil {
 			return sendError(err)
 		}
 
@@ -450,7 +450,7 @@ func (pConn *PFCPConn) handleSessionDeletionRequest(msg message.Message) (messag
 		return sendError(ErrWriteToDatapath)
 	}
 
-	if err := releaseAllocatedIPs(upf.Ippool, &session); err != nil {
+	if err := releaseAllocatedIPs(upf.ippool, &session); err != nil {
 		return sendError(ErrOperationFailedWithReason("session IP dealloc", err.Error()))
 	}
 

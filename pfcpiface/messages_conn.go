@@ -33,7 +33,7 @@ func (pConn *PFCPConn) sendAssociationRequest() {
 			return
 		}
 
-		if pConn.upf.EnableHBTimer {
+		if pConn.upf.enableHBTimer {
 			go pConn.startHeartBeatMonitor()
 		}
 	} else if timeout {
@@ -59,7 +59,7 @@ func (pConn *PFCPConn) handleHeartbeatRequest(msg message.Message) (message.Mess
 		return nil, errUnmarshal(errMsgUnexpectedType)
 	}
 
-	if pConn.upf.EnableHBTimer {
+	if pConn.upf.enableHBTimer {
 		// reset heartbeat expiry timer
 		// non-blocking write to channel
 		select {

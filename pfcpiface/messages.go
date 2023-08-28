@@ -79,7 +79,7 @@ func (pConn *PFCPConn) HandlePFCPMsg(buf []byte) {
 		reply, err = pConn.handlePFDMgmtRequest(msg)
 	case message.MsgTypeAssociationSetupRequest:
 		reply, err = pConn.handleAssociationSetupRequest(msg)
-		if reply != nil && err == nil && pConn.upf.EnableHBTimer {
+		if reply != nil && err == nil && pConn.upf.enableHBTimer {
 			go pConn.startHeartBeatMonitor()
 		}
 		// TODO: Cleanup sessions
@@ -157,10 +157,10 @@ func (pConn *PFCPConn) sendPFCPRequestMessage(r *Request) (message.Message, bool
 	pConn.pendingReqs.Store(r.msg.Sequence(), r)
 
 	pConn.SendPFCPMsg(r.msg)
-	retriesLeft := pConn.upf.MaxReqRetries
+	retriesLeft := pConn.upf.maxReqRetries
 
 	for {
-		if reply, rc := r.GetResponse(pConn.shutdown, pConn.upf.RespTimeout); rc {
+		if reply, rc := r.GetResponse(pConn.shutdown, pConn.upf.respTimeout); rc {
 			log.Traceln("Request Timeout, retriesLeft:", retriesLeft)
 
 			if retriesLeft > 0 {

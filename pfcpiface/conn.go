@@ -80,10 +80,10 @@ func (pConn *PFCPConn) startHeartBeatMonitor() {
 	pConn.hbCtxCancel = hbCancel
 
 	log.WithFields(log.Fields{
-		"interval": pConn.upf.HbInterval,
+		"interval": pConn.upf.hbInterval,
 	}).Infoln("Starting Heartbeat timer")
 
-	heartBeatExpiryTimer := time.NewTicker(pConn.upf.HbInterval)
+	heartBeatExpiryTimer := time.NewTicker(pConn.upf.hbInterval)
 
 	for {
 		select {
@@ -93,7 +93,7 @@ func (pConn *PFCPConn) startHeartBeatMonitor() {
 
 			return
 		case <-pConn.hbReset:
-			heartBeatExpiryTimer.Reset(pConn.upf.HbInterval)
+			heartBeatExpiryTimer.Reset(pConn.upf.hbInterval)
 		case <-heartBeatExpiryTimer.C:
 			log.Traceln("HeartBeat Interval Timer Expired", pConn.RemoteAddr().String())
 
@@ -187,7 +187,7 @@ func (pConn *PFCPConn) Serve() {
 		recvBuf := make([]byte, 65507) // Maximum UDP payload size
 
 		for {
-			err := pConn.SetReadDeadline(time.Now().Add(pConn.upf.ReadTimeout))
+			err := pConn.SetReadDeadline(time.Now().Add(pConn.upf.readTimeout))
 			if err != nil {
 				log.Errorf("failed to set read timeout: %v", err)
 			}

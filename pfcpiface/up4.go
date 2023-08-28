@@ -421,7 +421,7 @@ func (up4 *UP4) SetUpfInfo(u *upf, conf *Conf) {
 	p4rtcServer := conf.P4rtcIface.P4rtcServer
 
 	p4rtcPort := conf.P4rtcIface.P4rtcPort
-	up4.reportNotifyChan = u.ReportNotifyChan
+	up4.reportNotifyChan = u.reportNotifyChan
 
 	if *p4RtcServerIP != "" {
 		p4rtcServer = *p4RtcServerIP

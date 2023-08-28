@@ -295,8 +295,8 @@ func (b *bess) PortStats(uc *upfCollector, ch chan<- prometheus.Metric) {
 		dropped(res.Out.Dropped, "tx")
 	}
 
-	portstats("Access", uc.upf.AccessIface)
-	portstats("Core", uc.upf.CoreIface)
+	portstats("Access", uc.upf.accessIface)
+	portstats("Core", uc.upf.coreIface)
 }
 
 func (b *bess) SummaryLatencyJitter(uc *upfCollector, ch chan<- prometheus.Metric) {
@@ -338,8 +338,8 @@ func (b *bess) SummaryLatencyJitter(uc *upfCollector, ch chan<- prometheus.Metri
 			ch <- j
 		}
 	}
-	measureIface("Access", uc.upf.AccessIface)
-	measureIface("Core", uc.upf.CoreIface)
+	measureIface("Access", uc.upf.accessIface)
+	measureIface("Core", uc.upf.coreIface)
 }
 
 func (b *bess) flipFlowMeasurementBufferFlag(ctx context.Context, module string) (flip pb.FlowMeasureFlipResponse, err error) {
@@ -701,7 +701,7 @@ func (b *bess) SetUpfInfo(u *upf, conf *Conf) {
 			return
 		}
 
-		go b.notifyListen(u.ReportNotifyChan)
+		go b.notifyListen(u.reportNotifyChan)
 	}
 
 	if conf.EnableEndMarker {
