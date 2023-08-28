@@ -124,6 +124,12 @@ func (p *PFCPIface) Run() {
 	//lAddr := p.node.LocalAddr().String()
 	//PushPFCPInfo(lAddr)
 	fmt.Println("parham log : calling PushPFCPInfoNew")
+	fmt.Println("upf info before calling PushPFCPInfoNew :")
+	fmt.Println("dnn = ", p.node.upf.dnn)
+	fmt.Println("accessIP = ", p.node.upf.accessIP)
+	fmt.Println("coreIP = ", p.node.upf.coreIP)
+	fmt.Println("nodeID = ", p.node.upf.nodeID)
+
 	PushPFCPInfoNew(p.node.upf)
 	// blocking
 	p.node.Serve()
@@ -169,7 +175,11 @@ func PushPFCPInfo(lAddr string) error {
 }
 
 func PushPFCPInfoNew(upf *upf) {
-
+	fmt.Println("upf info inside PushPFCPInfoNew :")
+	fmt.Println("dnn = ", upf.dnn)
+	fmt.Println("accessIP = ", upf.accessIP)
+	fmt.Println("coreIP = ", upf.coreIP)
+	fmt.Println("nodeID = ", upf.nodeID)
 	// get IP
 	ip_str := GetLocalIP()
 	pfcpInfo := &PfcpInfo{
