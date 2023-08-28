@@ -4,6 +4,7 @@
 package pfcpiface
 
 import (
+	"fmt"
 	"net"
 	"time"
 
@@ -174,6 +175,11 @@ func NewUPF(conf *Conf, fp datapath) *upf {
 	}
 
 	u.datapath.SetUpfInfo(u, conf)
+	fmt.Println("upf info :")
+	fmt.Println("dnn = ", u.dnn)
+	fmt.Println("accessIP = ", u.accessIP)
+	fmt.Println("coreIP = ", u.coreIP)
+	fmt.Println("nodeID = ", u.nodeID)
 
 	return u
 }
