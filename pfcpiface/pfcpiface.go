@@ -124,13 +124,14 @@ func (p *PFCPIface) Run() {
 	//lAddr := p.node.LocalAddr().String()
 	//PushPFCPInfo(lAddr)
 	fmt.Println("parham log : calling PushPFCPInfoNew")
-	PushPFCPInfoNew()
+	PushPFCPInfoNew(p.node.upf)
 	// blocking
 	p.node.Serve()
 }
 
 type PfcpInfo struct {
-	Ip string `json:"ip"`
+	Ip  string `json:"ip"`
+	Upf *upf   `json:"upf"`
 }
 
 func PushPFCPInfo(lAddr string) error {
@@ -167,12 +168,13 @@ func PushPFCPInfo(lAddr string) error {
 	return nil
 }
 
-func PushPFCPInfoNew() {
+func PushPFCPInfoNew(upf *upf) {
 
 	// get IP
 	ip_str := GetLocalIP()
 	pfcpInfo := &PfcpInfo{
-		Ip: ip_str,
+		Ip:  ip_str,
+		Upf: upf,
 	}
 	fmt.Println("parham log : local ip = ", ip_str)
 	pfcpInfoJson, _ := json.Marshal(pfcpInfo)

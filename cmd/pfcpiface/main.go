@@ -6,6 +6,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
+
 	"github.com/omec-project/upf-epc/pfcpiface"
 	log "github.com/sirupsen/logrus"
 )
@@ -24,6 +26,8 @@ func init() {
 
 func main() {
 	// cmdline args
+	ip_str := pfcpiface.GetLocalIP()
+	fmt.Println("parham log : local IP = ", ip_str)
 	flag.Parse()
 
 	// Read and parse json startup file.
