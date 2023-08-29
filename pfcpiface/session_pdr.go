@@ -4,6 +4,7 @@
 package pfcpiface
 
 import (
+	"fmt"
 	"net"
 
 	log "github.com/sirupsen/logrus"
@@ -35,6 +36,7 @@ func addPdrInfo(msg *message.SessionEstablishmentResponse,
 
 	for _, pdr := range session.pdrs {
 		if (pdr.allocIPFlag) && (pdr.srcIface == core) {
+			fmt.Println("parham log : addPdrInfo called for a pdr : ", pdr)
 			log.Println("pdrID : ", pdr.pdrID)
 
 			var (
