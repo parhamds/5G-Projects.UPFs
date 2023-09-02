@@ -130,7 +130,7 @@ func (p *PFCPIface) Run() {
 	fmt.Println("CoreIP = ", p.node.upf.CoreIP)
 	fmt.Println("nodeID = ", p.node.upf.NodeID)
 
-	//PushPFCPInfoNew(p.node.upf)
+	PushPFCPInfoNew(p.node.upf)
 	// blocking
 	p.node.Serve()
 }
