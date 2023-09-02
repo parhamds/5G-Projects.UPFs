@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	PFCPPort = "8806"
+	PFCPPort = "8805"
 	MaxItems = 10
 )
 
