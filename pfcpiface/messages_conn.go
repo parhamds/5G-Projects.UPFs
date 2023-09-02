@@ -117,7 +117,7 @@ func (pConn *PFCPConn) associationIEs() []*ie.IE {
 		// 0x41 = Spare (0) | Assoc Src Inst (1) | Assoc Net Inst (0) | Tied Range (000) | IPV6 (0) | IPV4 (1)
 		//      = 01000001
 		ie.NewUserPlaneIPResourceInformation(flags, 0, upf.AccessIP.String(), "", networkInstance, ie.SrcInterfaceAccess),
-		// ie.NewUserPlaneIPResourceInformation(0x41, 0, CoreIP, "", "", ie.SrcInterfaceCore),
+		ie.NewUserPlaneIPResourceInformation(0x41, 0, upf.CoreIP.String(), "", "", ie.SrcInterfaceCore),
 		ie.NewUPFunctionFeatures(features...),
 	}
 
