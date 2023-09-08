@@ -140,11 +140,12 @@ func NewUPF(conf *Conf, fp datapath) *upf {
 	}
 
 	if !conf.EnableP4rt {
-		u.AccessIP, err = GetUnicastAddressFromInterface(conf.AccessIface.IfName)
-		if err != nil {
-			log.Errorln(err)
-			return nil
-		}
+		//u.AccessIP, err = GetUnicastAddressFromInterface(conf.AccessIface.IfName)
+		u.AccessIP = net.ParseIP("192.168.252.3")
+		//if err != nil {
+		//	log.Errorln(err)
+		//	return nil
+		//}
 
 		u.CoreIP, err = GetUnicastAddressFromInterface(conf.CoreIface.IfName)
 		if err != nil {
