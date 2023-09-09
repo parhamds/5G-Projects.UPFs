@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	pb "github.com/omec-project/upf-epc/pfcpiface/bess_pb"
+	"github.com/omec-project/upf-epc/pkg/utils"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 	"github.com/wmnsk/go-pfcp/ie"
@@ -1102,12 +1103,12 @@ func (b *bess) addFAR(ctx context.Context, done chan<- bool, far far) {
 				intEnc(far.fseID),         /* fseid */
 			},
 			Values: []*pb.FieldData{
-				intEnc(uint64(action)),           /* action */
-				intEnc(uint64(far.tunnelType)),   /* tunnel_out_type */
-				intEnc(uint64(far.tunnelIP4Src)), /* access-ip */
-				intEnc(uint64(far.tunnelIP4Dst)), /* enb ip */
-				intEnc(uint64(far.tunnelTEID)),   /* enb teid */
-				intEnc(uint64(far.tunnelPort)),   /* udp gtpu port */
+				intEnc(uint64(action)),                                           /* action */
+				intEnc(uint64(far.tunnelType)),                                   /* tunnel_out_type */
+				intEnc(uint64(utils.Ip4ToUint32(net.ParseIP("192.168.252.31")))), /* access-ip */
+				intEnc(uint64(far.tunnelIP4Dst)),                                 /* enb ip */
+				intEnc(uint64(far.tunnelTEID)),                                   /* enb teid */
+				intEnc(uint64(far.tunnelPort)),                                   /* udp gtpu port */
 			},
 		}
 
