@@ -4,7 +4,12 @@
 package pfcpiface
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"sync"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -36,6 +41,55 @@ func (i *InMemoryStore) GetAllSessions() []PFCPSession {
 	return sessions
 }
 
+type RuleReq struct {
+	Teid []string `json:"teid"`
+	Ip   []string `json:"ip"`
+}
+
+func PushPDRInfo(addresses []uint32) {
+	addrStr := make([]string, 0)
+	for _, i := range addresses {
+		ipStr := int2ip(i)
+		addrStr = append(addrStr, ipStr.String())
+	}
+	rulereq := RuleReq{
+		Ip: addrStr,
+	}
+	ruleReqJson, _ := json.Marshal(rulereq)
+
+	fmt.Printf("parham log : json encoded pfcpInfo [%s] ", ruleReqJson)
+
+	// change the IP here
+	requestURL := "http://exitlb:8080/addrule"
+	jsonBody := []byte(ruleReqJson)
+
+	bodyReader := bytes.NewReader(jsonBody)
+	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+	if err != nil {
+		log.Errorf("client: could not create request: %s\n", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := http.Client{
+		Timeout: 10 * time.Second,
+	}
+	done := false
+	for !done {
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Errorf("client: error making http request: %s\n", err)
+		} else if resp.StatusCode == http.StatusCreated {
+			done = true
+			fmt.Println("parham log : resp header = ", resp.Header)
+			fmt.Println("parham log : resp status = ", resp.Status)
+			return
+		}
+		time.Sleep(1 * time.Second)
+	}
+
+}
+
 func (i *InMemoryStore) PutSession(session PFCPSession) error {
 	if session.localSEID == 0 {
 		return ErrInvalidArgument("session.localSEID", session.localSEID)
@@ -46,7 +100,20 @@ func (i *InMemoryStore) PutSession(session PFCPSession) error {
 	log.WithFields(log.Fields{
 		"session": session,
 	}).Trace("Saved PFCP sessions to local store")
-
+	uEAddresses := make([]uint32, 0)
+	for _, v := range session.pdrs {
+		exists := false
+		for _, u := range uEAddresses {
+			if u == v.ueAddress {
+				exists = true
+				break
+			}
+		}
+		if !exists {
+			uEAddresses = append(uEAddresses, v.ueAddress)
+		}
+	}
+	go PushPDRInfo(uEAddresses)
 	return nil
 }
 
