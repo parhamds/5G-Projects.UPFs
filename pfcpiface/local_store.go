@@ -44,9 +44,14 @@ func (i *InMemoryStore) GetAllSessions() []PFCPSession {
 }
 
 type RuleReq struct {
-	GwIP string   `json:"gwip"`
-	Teid []string `json:"teid"`
-	Ip   []string `json:"ip"`
+	GwIP string `json:"gwip"`
+	//Teid []string `json:"teid"`
+	Ip []string `json:"ip"`
+}
+
+type RegisterReq struct {
+	GwIP    string `json:"gwip"`
+	CoreMac string `json:"coremac"`
 }
 
 func getExitLbInt() string {
@@ -75,21 +80,21 @@ func parseGatewayIP(output string) string {
 	return ""
 }
 
-func PushPDRInfo(teids, addresses []uint32) {
+func PushPDRInfo(addresses []uint32) {
 	gatewayIP := getExitLbInt()
 	addrStr := make([]string, 0)
-	teidStr := make([]string, 0)
+	//teidStr := make([]string, 0)
 	for _, i := range addresses {
 		ipStr := int2ip(i)
 		addrStr = append(addrStr, ipStr.String())
 	}
-	for _, t := range teids {
-		teidStr = append(teidStr, fmt.Sprint(t))
-	}
+	//for _, t := range teids {
+	//	teidStr = append(teidStr, fmt.Sprint(t))
+	//}
 	rulereq := RuleReq{
 		GwIP: gatewayIP,
 		Ip:   addrStr,
-		Teid: teidStr,
+		//Teid: teidStr,
 	}
 	ruleReqJson, _ := json.Marshal(rulereq)
 
@@ -124,11 +129,6 @@ func PushPDRInfo(teids, addresses []uint32) {
 		time.Sleep(1 * time.Second)
 	}
 
-}
-
-type RegisterReq struct {
-	GwIP    string `json:"gwip"`
-	CoreMac string `json:"coremac"`
 }
 
 func RegisterToExitlb() {
@@ -184,7 +184,7 @@ func (i *InMemoryStore) PutSession(session PFCPSession) error {
 		"session": session,
 	}).Trace("Saved PFCP sessions to local store")
 	uEAddresses := make([]uint32, 0)
-	teids := make([]uint32, 0)
+	//teids := make([]uint32, 0)
 	for _, p := range session.pdrs {
 		exists := false
 		for _, u := range uEAddresses {
@@ -195,15 +195,16 @@ func (i *InMemoryStore) PutSession(session PFCPSession) error {
 		}
 		if !exists {
 			uEAddresses = append(uEAddresses, p.ueAddress)
-			fseid := p.fseID
-			for _, f := range session.fars {
-				if f.fseID == fseid {
-					teids = append(teids, f.tunnelTEID)
-				}
-			}
+			//fseid := p.fseID
+			//for _, f := range session.fars {
+			//	if f.fseID == fseid {
+			//		teids = append(teids, f.tunnelTEID)
+			//	}
+			//}
 		}
 	}
-	go PushPDRInfo(teids, uEAddresses)
+	//go PushPDRInfo(teids, uEAddresses)
+	go PushPDRInfo(uEAddresses)
 	return nil
 }
 
