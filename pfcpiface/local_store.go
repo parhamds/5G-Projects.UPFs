@@ -126,6 +126,53 @@ func PushPDRInfo(teids, addresses []uint32) {
 
 }
 
+type RegisterReq struct {
+	GwIP    string `json:"gwip"`
+	CoreMac string `json:"coremac"`
+}
+
+func RegisterToExitlb() {
+	gatewayIP := getExitLbInt()
+	coreMac := GetCoreMac()
+	registerReq := RegisterReq{
+		GwIP:    gatewayIP,
+		CoreMac: coreMac,
+	}
+	registerReqJson, _ := json.Marshal(registerReq)
+
+	fmt.Printf("parham log : json encoded pfcpInfo [%s] ", registerReqJson)
+
+	// change the IP here
+	requestURL := "http://exitlb:8080/register"
+	jsonBody := []byte(registerReqJson)
+
+	bodyReader := bytes.NewReader(jsonBody)
+	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+	if err != nil {
+		log.Errorf("client: could not create request: %s\n", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := http.Client{
+		Timeout: 10 * time.Second,
+	}
+	done := false
+	for !done {
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Errorf("client: error making http request: %s\n", err)
+		} else if resp.StatusCode == http.StatusCreated {
+			done = true
+			fmt.Println("parham log : resp header = ", resp.Header)
+			fmt.Println("parham log : resp status = ", resp.Status)
+			return
+		}
+		time.Sleep(1 * time.Second)
+	}
+
+}
+
 func (i *InMemoryStore) PutSession(session PFCPSession) error {
 	if session.localSEID == 0 {
 		return ErrInvalidArgument("session.localSEID", session.localSEID)

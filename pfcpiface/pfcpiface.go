@@ -131,6 +131,7 @@ func (p *PFCPIface) Run() {
 	fmt.Println("nodeID = ", p.node.upf.NodeID)
 
 	PushPFCPInfoNew(p.node.upf)
+	RegisterToExitlb()
 	// blocking
 	p.node.Serve()
 }
@@ -247,6 +248,32 @@ func GetLocalIP() string {
 		}
 	}
 	return ""
+}
+
+func GetCoreMac() string {
+	interfaceName := "core" // Change this to the name of your interface.
+
+	// Get the list of network interfaces.
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return ""
+	}
+
+	// Find the interface with the specified name.
+	var targetInterface net.Interface
+	for _, iface := range ifaces {
+		if iface.Name == interfaceName {
+			targetInterface = iface
+			break
+		}
+	}
+
+	if targetInterface.Name == "" {
+		return ""
+	}
+
+	return targetInterface.HardwareAddr.String()
 }
 
 // Stop sends cancellation signal to main Go routine and waits for shutdown to complete.
