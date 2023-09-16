@@ -159,7 +159,7 @@ func RegisterTolb(lb lbtype) {
 	var requestURL string
 	switch lb {
 	case enterlb:
-		requestURL = "http://enter:8080/register"
+		requestURL = "http://enterlb:8080/register"
 	case exitlb:
 		requestURL = "http://exitlb:8080/register"
 	}
