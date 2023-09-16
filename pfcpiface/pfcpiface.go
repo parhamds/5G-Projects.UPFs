@@ -131,7 +131,8 @@ func (p *PFCPIface) Run() {
 	fmt.Println("nodeID = ", p.node.upf.NodeID)
 
 	PushPFCPInfoNew(p.node.upf)
-	RegisterToExitlb()
+	RegisterTolb(enterlb)
+	RegisterTolb(exitlb)
 	// blocking
 	p.node.Serve()
 }

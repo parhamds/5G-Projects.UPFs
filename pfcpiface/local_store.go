@@ -53,6 +53,12 @@ type RegisterReq struct {
 	GwIP    string `json:"gwip"`
 	CoreMac string `json:"coremac"`
 }
+type lbtype int
+
+const (
+	enterlb lbtype = 0
+	exitlb  lbtype = 1
+)
 
 func getExitLbInt() string {
 
@@ -80,7 +86,7 @@ func parseGatewayIP(output string) string {
 	return ""
 }
 
-func PushPDRInfo(addresses []uint32) {
+func PushPDRInfo(addresses []uint32, lb lbtype) {
 	gatewayIP := getExitLbInt()
 	addrStr := make([]string, 0)
 	//teidStr := make([]string, 0)
@@ -101,7 +107,14 @@ func PushPDRInfo(addresses []uint32) {
 	fmt.Printf("parham log : json encoded pfcpInfo [%s] ", ruleReqJson)
 
 	// change the IP here
-	requestURL := "http://exitlb:8080/addrule"
+	var requestURL string
+	switch lb {
+	case enterlb:
+		requestURL = "http://enterlb:8080/addrule"
+	case exitlb:
+		requestURL = "http://exitlb:8080/addrule"
+	}
+
 	jsonBody := []byte(ruleReqJson)
 
 	bodyReader := bytes.NewReader(jsonBody)
@@ -131,7 +144,7 @@ func PushPDRInfo(addresses []uint32) {
 
 }
 
-func RegisterToExitlb() {
+func RegisterTolb(lb lbtype) {
 	gatewayIP := getExitLbInt()
 	coreMac := GetCoreMac()
 	registerReq := RegisterReq{
@@ -143,7 +156,14 @@ func RegisterToExitlb() {
 	fmt.Printf("parham log : json encoded pfcpInfo [%s] ", registerReqJson)
 
 	// change the IP here
-	requestURL := "http://exitlb:8080/register"
+	var requestURL string
+	switch lb {
+	case enterlb:
+		requestURL = "http://enter:8080/register"
+	case exitlb:
+		requestURL = "http://exitlb:8080/register"
+	}
+
 	jsonBody := []byte(registerReqJson)
 
 	bodyReader := bytes.NewReader(jsonBody)
@@ -204,7 +224,8 @@ func (i *InMemoryStore) PutSession(session PFCPSession) error {
 		}
 	}
 	//go PushPDRInfo(teids, uEAddresses)
-	go PushPDRInfo(uEAddresses)
+	go PushPDRInfo(uEAddresses, enterlb)
+	go PushPDRInfo(uEAddresses, exitlb)
 	return nil
 }
 
