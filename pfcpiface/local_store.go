@@ -224,8 +224,8 @@ func (i *InMemoryStore) PutSession(session PFCPSession) error {
 		}
 	}
 	//go PushPDRInfo(teids, uEAddresses)
-	go PushPDRInfo(uEAddresses, enterlb)
-	go PushPDRInfo(uEAddresses, exitlb)
+	PushPDRInfo(uEAddresses, enterlb)
+	PushPDRInfo(uEAddresses, exitlb)
 	return nil
 }
 
