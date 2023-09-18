@@ -31,31 +31,23 @@ func (p PacketForwardingRules) String() string {
 
 // NewPFCPSession allocates an session with ID.
 func (pConn *PFCPConn) NewPFCPSession(rseid uint64) (PFCPSession, bool) {
-	for i := 0; i < pConn.maxRetries; i++ {
-		lseid := pConn.rng.Uint64()
-		// Check if it already exists
-		if _, ok := pConn.store.GetSession(lseid); ok {
-			continue
-		}
 
-		s := PFCPSession{
-			localSEID:  lseid,
-			remoteSEID: rseid,
-			PacketForwardingRules: PacketForwardingRules{
-				pdrs: make([]pdr, 0, MaxItems),
-				fars: make([]far, 0, MaxItems),
-				qers: make([]qer, 0, MaxItems),
-			},
-		}
-		s.metrics = metrics.NewSession(pConn.nodeID.remote)
-
-		// Metrics update
-		pConn.SaveSessions(s.metrics)
-
-		return s, true
+	s := PFCPSession{
+		localSEID:  rseid,
+		remoteSEID: rseid,
+		PacketForwardingRules: PacketForwardingRules{
+			pdrs: make([]pdr, 0, MaxItems),
+			fars: make([]far, 0, MaxItems),
+			qers: make([]qer, 0, MaxItems),
+		},
 	}
+	s.metrics = metrics.NewSession(pConn.nodeID.remote)
 
-	return PFCPSession{}, false
+	// Metrics update
+	pConn.SaveSessions(s.metrics)
+
+	return s, true
+
 }
 
 // RemoveSession removes session using lseid.
