@@ -34,7 +34,7 @@ func (pConn *PFCPConn) handleSessionEstablishmentRequest(msg message.Message) (m
 			0,
 			0,
 			sereq.SequenceNumber,
-			0,
+			sereq.Header.MessagePriority,
 			ie.NewCause(ie.CauseRequestRejected),
 			offendingIE,
 		)
@@ -59,10 +59,10 @@ func (pConn *PFCPConn) handleSessionEstablishmentRequest(msg message.Message) (m
 	errProcessReply := func(err error, cause uint8) (message.Message, error) {
 		// Build response message
 		seres := message.NewSessionEstablishmentResponse(0, /* MO?? <-- what's this */
-			0,                    /* FO <-- what's this? */
-			remoteSEID,           /* seid */
-			sereq.SequenceNumber, /* seq # */
-			0,                    /* priority */
+			0,                            /* FO <-- what's this? */
+			remoteSEID,                   /* seid */
+			sereq.SequenceNumber,         /* seq # */
+			sereq.Header.MessagePriority, /* priority */
 			pConn.nodeID.localIE,
 			ie.NewCause(cause),
 		)
@@ -159,7 +159,7 @@ func (pConn *PFCPConn) handleSessionEstablishmentRequest(msg message.Message) (m
 		0,                                    /* FO <-- what's this? */
 		session.remoteSEID,                   /* seid */
 		sereq.SequenceNumber,                 /* seq # */
-		0,                                    /* priority */
+		sereq.Header.MessagePriority,         /* priority */
 		pConn.nodeID.localIE,                 /* node id */
 		ie.NewCause(ie.CauseRequestAccepted), /* accept it blindly for the time being */
 		localFSEID,
@@ -187,7 +187,7 @@ func (pConn *PFCPConn) handleSessionModificationRequest(msg message.Message) (me
 			0,                                    /* FO <-- what's this? */
 			remoteSEID,                           /* seid */
 			smreq.SequenceNumber,                 /* seq # */
-			0,                                    /* priority */
+			smreq.Header.MessagePriority,         /* priority */
 			ie.NewCause(ie.CauseRequestRejected), /* accept it blindly for the time being */
 		)
 
@@ -410,7 +410,7 @@ func (pConn *PFCPConn) handleSessionModificationRequest(msg message.Message) (me
 		0,                                    /* FO <-- what's this? */
 		remoteSEID,                           /* seid */
 		smreq.SequenceNumber,                 /* seq # */
-		0,                                    /* priority */
+		smreq.Header.MessagePriority,         /* priority */
 		ie.NewCause(ie.CauseRequestAccepted), /* accept it blindly for the time being */
 	)
 
@@ -430,7 +430,7 @@ func (pConn *PFCPConn) handleSessionDeletionRequest(msg message.Message) (messag
 			0,                                    /* FO <-- what's this? */
 			0,                                    /* seid */
 			sdreq.SequenceNumber,                 /* seq # */
-			0,                                    /* priority */
+			sdreq.Header.MessagePriority,         /* priority */
 			ie.NewCause(ie.CauseRequestRejected), /* accept it blindly for the time being */
 		)
 
@@ -462,7 +462,7 @@ func (pConn *PFCPConn) handleSessionDeletionRequest(msg message.Message) (messag
 		0,                                    /* FO <-- what's this? */
 		session.remoteSEID,                   /* seid */
 		sdreq.SequenceNumber,                 /* seq # */
-		0,                                    /* priority */
+		sdreq.Header.MessagePriority,         /* priority */
 		ie.NewCause(ie.CauseRequestAccepted), /* accept it blindly for the time being */
 	)
 
