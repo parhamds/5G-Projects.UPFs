@@ -58,9 +58,10 @@ type PFCPConn struct {
 	nodeID nodeID
 	upf    *upf
 	// channel to signal PFCPNode on exit
-	done     chan<- string
-	shutdown chan struct{}
-
+	done             chan<- string
+	shutdown         chan struct{}
+	gwIp             string
+	sentIpsToRouters map[uint32]struct{}
 	metrics.InstrumentPFCP
 
 	hbReset     chan struct{}
@@ -125,18 +126,20 @@ func (node *PFCPNode) NewPFCPConn(lAddr, rAddr string, buf []byte) *PFCPConn {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano())) // #nosec G404
 
 	var p = &PFCPConn{
-		ctx:            node.ctx,
-		Conn:           conn,
-		ts:             ts,
-		rng:            rng,
-		maxRetries:     100,
-		store:          NewInMemoryStore(),
-		upf:            node.upf,
-		done:           node.pConnDone,
-		shutdown:       make(chan struct{}),
-		InstrumentPFCP: node.metrics,
-		hbReset:        make(chan struct{}, 100),
-		hbCtxCancel:    nil,
+		ctx:              node.ctx,
+		Conn:             conn,
+		ts:               ts,
+		rng:              rng,
+		maxRetries:       100,
+		store:            NewInMemoryStore(),
+		upf:              node.upf,
+		done:             node.pConnDone,
+		shutdown:         make(chan struct{}),
+		InstrumentPFCP:   node.metrics,
+		hbReset:          make(chan struct{}, 100),
+		hbCtxCancel:      nil,
+		gwIp:             node.gwIP,
+		sentIpsToRouters: make(map[uint32]struct{}),
 	}
 
 	p.setLocalNodeID(node.upf.NodeID)

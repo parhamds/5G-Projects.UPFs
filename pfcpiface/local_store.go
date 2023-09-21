@@ -86,8 +86,8 @@ func parseGatewayIP(output string) string {
 	return ""
 }
 
-func PushPDRInfo(addresses []uint32, lb lbtype) {
-	gatewayIP := getExitLbInt()
+func (pConn *PFCPConn) PushPDRInfo(addresses []uint32, lb lbtype) {
+	gatewayIP := pConn.gwIp
 	addrStr := make([]string, 0)
 	//teidStr := make([]string, 0)
 	for _, i := range addresses {
@@ -144,8 +144,8 @@ func PushPDRInfo(addresses []uint32, lb lbtype) {
 
 }
 
-func RegisterTolb(lb lbtype) {
-	gatewayIP := getExitLbInt()
+func (node *PFCPNode) RegisterTolb(lb lbtype) {
+	gatewayIP := node.gwIP
 	coreMac := GetCoreMac()
 	registerReq := RegisterReq{
 		GwIP:    gatewayIP,
@@ -193,7 +193,7 @@ func RegisterTolb(lb lbtype) {
 
 }
 
-func (i *InMemoryStore) PutSession(session PFCPSession) error {
+func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn) error {
 	if session.localSEID == 0 {
 		return ErrInvalidArgument("session.localSEID", session.localSEID)
 	}
@@ -213,8 +213,9 @@ func (i *InMemoryStore) PutSession(session PFCPSession) error {
 				break
 			}
 		}
-		if !exists {
+		if _, ok := pConn.sentIpsToRouters[p.ueAddress]; !ok && !exists {
 			uEAddresses = append(uEAddresses, p.ueAddress)
+			pConn.sentIpsToRouters[p.ueAddress] = struct{}{}
 			//fseid := p.fseID
 			//for _, f := range session.fars {
 			//	if f.fseID == fseid {
@@ -224,12 +225,19 @@ func (i *InMemoryStore) PutSession(session PFCPSession) error {
 		}
 	}
 	//go PushPDRInfo(teids, uEAddresses)
-	PushPDRInfo(uEAddresses, enterlb)
-	PushPDRInfo(uEAddresses, exitlb)
+	pConn.PushPDRInfo(uEAddresses, enterlb)
+	pConn.PushPDRInfo(uEAddresses, exitlb)
 	return nil
 }
 
-func (i *InMemoryStore) DeleteSession(fseid uint64) error {
+func (i *InMemoryStore) DeleteSession(fseid uint64, pConn *PFCPConn) error {
+	session, found := i.GetSession(fseid)
+	if found {
+		for _, p := range session.pdrs {
+			delete(pConn.sentIpsToRouters, p.ueAddress)
+		}
+	}
+
 	i.sessions.Delete(fseid)
 
 	log.WithFields(log.Fields{

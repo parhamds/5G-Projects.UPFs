@@ -27,6 +27,7 @@ type PFCPNode struct {
 	pConnDone chan string
 	// map of existing connections
 	pConns sync.Map
+	gwIP   string
 	// upf
 	upf *upf
 	// metrics for PFCP messages and sessions
@@ -55,6 +56,7 @@ func NewPFCPNode(upf *upf) *PFCPNode {
 		pConnDone:  make(chan string, 100),
 		upf:        upf,
 		metrics:    metrics,
+		gwIP:       getExitLbInt(),
 	}
 }
 
