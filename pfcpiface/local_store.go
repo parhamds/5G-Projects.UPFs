@@ -149,7 +149,7 @@ func (pConn *PFCPConn) PushPDRInfo(addresses []uint32, lb lbtype) {
 
 func (node *PFCPNode) RegisterTolb(lb lbtype) {
 	gatewayIP := node.gwIP
-	coreMac := GetCoreMac()
+	coreMac := node.coreMac
 	registerReq := RegisterReq{
 		GwIP:    gatewayIP,
 		CoreMac: coreMac,
@@ -234,12 +234,6 @@ func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn) error {
 }
 
 func (i *InMemoryStore) DeleteSession(fseid uint64, pConn *PFCPConn) error {
-	session, found := i.GetSession(fseid)
-	if found {
-		for _, p := range session.pdrs {
-			delete(pConn.sentIpsToRouters, p.ueAddress)
-		}
-	}
 
 	i.sessions.Delete(fseid)
 

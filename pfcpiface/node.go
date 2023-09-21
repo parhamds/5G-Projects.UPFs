@@ -26,8 +26,9 @@ type PFCPNode struct {
 	// channel for PFCPConn to signal exit by sending their remote address
 	pConnDone chan string
 	// map of existing connections
-	pConns sync.Map
-	gwIP   string
+	pConns  sync.Map
+	gwIP    string
+	coreMac string
 	// upf
 	upf *upf
 	// metrics for PFCP messages and sessions
@@ -57,6 +58,7 @@ func NewPFCPNode(upf *upf) *PFCPNode {
 		upf:        upf,
 		metrics:    metrics,
 		gwIP:       getExitLbInt(),
+		coreMac:    GetCoreMac(),
 	}
 }
 

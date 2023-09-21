@@ -56,6 +56,10 @@ func (pConn *PFCPConn) RemoveSession(session PFCPSession) {
 	session.metrics.Delete()
 	pConn.SaveSessions(session.metrics)
 
+	for _, p := range session.pdrs {
+		delete(pConn.sentIpsToRouters, p.ueAddress)
+	}
+
 	if err := pConn.store.DeleteSession(session.localSEID, pConn); err != nil {
 		log.Errorf("Failed to delete PFCP session from store: %v", err)
 	}
