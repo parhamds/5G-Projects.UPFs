@@ -87,6 +87,9 @@ func parseGatewayIP(output string) string {
 }
 
 func (pConn *PFCPConn) PushPDRInfo(addresses []uint32, lb lbtype) {
+	if len(addresses) == 0 {
+		return
+	}
 	gatewayIP := pConn.gwIp
 	addrStr := make([]string, 0)
 	//teidStr := make([]string, 0)
