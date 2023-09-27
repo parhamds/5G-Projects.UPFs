@@ -51,7 +51,7 @@ type upf struct {
 	reportNotifyChan  chan uint64
 	sliceInfo         *SliceInfo
 	readTimeout       time.Duration
-
+	Hostname          string `json:"hostname"`
 	datapath
 	maxReqRetries uint8
 	respTimeout   time.Duration
@@ -128,6 +128,7 @@ func NewUPF(conf *Conf, fp datapath) *upf {
 		maxReqRetries:     conf.MaxReqRetries,
 		enableHBTimer:     conf.EnableHBTimer,
 		readTimeout:       time.Second * time.Duration(conf.ReadTimeout),
+		Hostname:          conf.CPIface.NodeID,
 	}
 
 	if len(conf.CPIface.Peers) > 0 {
