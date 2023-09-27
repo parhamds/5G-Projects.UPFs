@@ -140,7 +140,7 @@ func (pConn *PFCPConn) handleSessionEstablishmentRequest(msg message.Message) (m
 			ie.CauseRequestRejected)
 	}
 
-	err = pConn.store.PutSession(session, pConn)
+	err = pConn.store.PutSession(session, pConn, sereq.Header.Type)
 	if err != nil {
 		log.Errorf("Failed to put PFCP session to store: %v", err)
 	}
@@ -400,7 +400,7 @@ func (pConn *PFCPConn) handleSessionModificationRequest(msg message.Message) (me
 		return sendError(ErrWriteToDatapath)
 	}
 
-	err := pConn.store.PutSession(session, pConn)
+	err := pConn.store.PutSession(session, pConn, smreq.Header.Type)
 	if err != nil {
 		log.Errorf("Failed to put PFCP session to store: %v", err)
 	}

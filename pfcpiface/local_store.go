@@ -14,6 +14,7 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/wmnsk/go-pfcp/message"
 )
 
 type InMemoryStore struct {
@@ -196,7 +197,7 @@ func (node *PFCPNode) RegisterTolb(lb lbtype) {
 
 }
 
-func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn) error {
+func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn, msgType uint8) error {
 	if session.localSEID == 0 {
 		return ErrInvalidArgument("session.localSEID", session.localSEID)
 	}
@@ -206,30 +207,32 @@ func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn) error {
 	log.WithFields(log.Fields{
 		"session": session,
 	}).Trace("Saved PFCP sessions to local store")
-	uEAddresses := make([]uint32, 0)
-	//teids := make([]uint32, 0)
-	for _, p := range session.pdrs {
-		exists := false
-		for _, u := range uEAddresses {
-			if u == p.ueAddress {
-				exists = true
-				break
+	if msgType == message.MsgTypeSessionEstablishmentRequest {
+		uEAddresses := make([]uint32, 0)
+		//teids := make([]uint32, 0)
+		for _, p := range session.pdrs {
+			exists := false
+			for _, u := range uEAddresses {
+				if u == p.ueAddress {
+					exists = true
+					break
+				}
+			}
+			if _, ok := pConn.sentIpsToRouters[p.ueAddress]; !ok && !exists {
+				uEAddresses = append(uEAddresses, p.ueAddress)
+				pConn.sentIpsToRouters[p.ueAddress] = struct{}{}
+				//fseid := p.fseID
+				//for _, f := range session.fars {
+				//	if f.fseID == fseid {
+				//		teids = append(teids, f.tunnelTEID)
+				//	}
+				//}
 			}
 		}
-		if _, ok := pConn.sentIpsToRouters[p.ueAddress]; !ok && !exists {
-			uEAddresses = append(uEAddresses, p.ueAddress)
-			pConn.sentIpsToRouters[p.ueAddress] = struct{}{}
-			//fseid := p.fseID
-			//for _, f := range session.fars {
-			//	if f.fseID == fseid {
-			//		teids = append(teids, f.tunnelTEID)
-			//	}
-			//}
-		}
+		//go PushPDRInfo(teids, uEAddresses)
+		pConn.PushPDRInfo(uEAddresses, enterlb)
+		pConn.PushPDRInfo(uEAddresses, exitlb)
 	}
-	//go PushPDRInfo(teids, uEAddresses)
-	pConn.PushPDRInfo(uEAddresses, enterlb)
-	pConn.PushPDRInfo(uEAddresses, exitlb)
 	return nil
 }
 
