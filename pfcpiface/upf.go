@@ -52,6 +52,7 @@ type upf struct {
 	sliceInfo         *SliceInfo
 	readTimeout       time.Duration
 	Hostname          string `json:"hostname"`
+	GwIp              string `json:"gwip"`
 	datapath
 	maxReqRetries uint8
 	respTimeout   time.Duration
@@ -129,6 +130,7 @@ func NewUPF(conf *Conf, fp datapath) *upf {
 		enableHBTimer:     conf.EnableHBTimer,
 		readTimeout:       time.Second * time.Duration(conf.ReadTimeout),
 		Hostname:          conf.CPIface.NodeID,
+		GwIp:              getExitLbInt(),
 	}
 
 	if len(conf.CPIface.Peers) > 0 {

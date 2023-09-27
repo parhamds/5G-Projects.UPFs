@@ -230,8 +230,8 @@ func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn, msgType
 			}
 		}
 		//go PushPDRInfo(teids, uEAddresses)
-		pConn.PushPDRInfo(uEAddresses, enterlb)
-		pConn.PushPDRInfo(uEAddresses, exitlb)
+		//pConn.PushPDRInfo(uEAddresses, enterlb)
+		//pConn.PushPDRInfo(uEAddresses, exitlb)
 	}
 	return nil
 }
