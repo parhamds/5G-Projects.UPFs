@@ -111,6 +111,11 @@ func (p *PFCPIface) Run() {
 		log.Infoln("http server closed")
 	}()
 
+	http.HandleFunc("/register", RegisterGw)
+	server := http.Server{Addr: ":8080"}
+
+	go server.ListenAndServe()
+
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
 	signal.Notify(sig, syscall.SIGTERM)
