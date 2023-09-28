@@ -112,7 +112,7 @@ func (p *PFCPIface) Run() {
 	}()
 
 	http.HandleFunc("/register", RegisterGw)
-	server := http.Server{Addr: ":8080"}
+	server := http.Server{Addr: ":8081"}
 
 	go server.ListenAndServe()
 
