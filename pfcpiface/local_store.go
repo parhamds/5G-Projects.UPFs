@@ -103,23 +103,28 @@ func (pConn *PFCPConn) PushPDRInfo(addresses []uint32) {
 		GwIP: gatewayIP,
 		Ip:   addrStr,
 	}
-	ruleReqJson, _ := json.Marshal(rulereq)
+	ruleReqJson, err := json.Marshal(rulereq)
+	if err != nil {
+		log.Errorf("err while trying to marshal ruleReq: %s\n", err)
+	}
 
 	enterRequestURL := "http://enterlb:8080/addrule"
 
 	exitRequestURL := "http://exitlb:8080/addrule"
 
-	jsonBody := []byte(ruleReqJson)
+	enterJsonBody := []byte(ruleReqJson)
+	exitJsonBody := []byte(ruleReqJson)
 
-	bodyReader := bytes.NewReader(jsonBody)
+	enterBodyReader := bytes.NewReader(enterJsonBody)
+	exitBodyReader := bytes.NewReader(exitJsonBody)
 
-	enterReq, err := http.NewRequest(http.MethodPost, enterRequestURL, bodyReader)
+	enterReq, err := http.NewRequest(http.MethodPost, enterRequestURL, enterBodyReader)
 	if err != nil {
 		log.Errorf("client: could not create request: %s\n", err)
 	}
 	enterReq.Header.Set("Content-Type", "application/json")
 
-	exitReq, err := http.NewRequest(http.MethodPost, exitRequestURL, bodyReader)
+	exitReq, err := http.NewRequest(http.MethodPost, exitRequestURL, exitBodyReader)
 	if err != nil {
 		log.Errorf("client: could not create request: %s\n", err)
 	}
@@ -146,6 +151,7 @@ func (pConn *PFCPConn) sendToLBer(req *http.Request) {
 			fmt.Println("parham log : resp status = ", resp.Status)
 			return
 		}
+		retries++
 		time.Sleep(1 * time.Second)
 	}
 }
