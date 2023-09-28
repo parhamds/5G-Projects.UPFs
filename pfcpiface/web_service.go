@@ -39,10 +39,14 @@ type UeResInfo struct {
 type ConfigHandler struct {
 	upf *upf
 }
+type RegisterGw struct {
+}
 
 func setupConfigHandler(mux *http.ServeMux, upf *upf) {
 	cfgHandler := ConfigHandler{upf: upf}
 	mux.Handle("/v1/config/network-slices", &cfgHandler)
+	registerGw := RegisterGw{}
+	mux.Handle("/registergw", &registerGw)
 }
 
 type GWRegisterReq struct {
@@ -50,7 +54,7 @@ type GWRegisterReq struct {
 	GwMac string `json:"gwmac"`
 }
 
-func RegisterGw(w http.ResponseWriter, r *http.Request) {
+func (registerGw *RegisterGw) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Infoln("handle http request for /registergw")
 
 	switch r.Method {

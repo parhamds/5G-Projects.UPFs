@@ -111,10 +111,10 @@ func (p *PFCPIface) Run() {
 		log.Infoln("http server closed")
 	}()
 
-	http.HandleFunc("/registergw", RegisterGw)
-	server := http.Server{Addr: ":8082"}
-	log.Traceln("starting http server on 8082")
-	go server.ListenAndServe()
+	//http.HandleFunc("/registergw", RegisterGw)
+	//server := http.Server{Addr: ":8082"}
+	//log.Traceln("starting http server on 8082")
+	//go server.ListenAndServe()
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
