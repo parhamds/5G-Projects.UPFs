@@ -87,7 +87,7 @@ func parseGatewayIP(output string) string {
 	return ""
 }
 
-func (pConn *PFCPConn) PushPDRInfo(addresses []uint32, lb lbtype) {
+func (pConn *PFCPConn) PushPDRInfo(addresses []uint32) {
 	if len(addresses) == 0 {
 		return
 	}
@@ -98,42 +98,45 @@ func (pConn *PFCPConn) PushPDRInfo(addresses []uint32, lb lbtype) {
 		ipStr := int2ip(i)
 		addrStr = append(addrStr, ipStr.String())
 	}
-	//for _, t := range teids {
-	//	teidStr = append(teidStr, fmt.Sprint(t))
-	//}
+
 	rulereq := RuleReq{
 		GwIP: gatewayIP,
 		Ip:   addrStr,
-		//Teid: teidStr,
 	}
 	ruleReqJson, _ := json.Marshal(rulereq)
 
-	fmt.Printf("parham log : json encoded pfcpInfo [%s] ", ruleReqJson)
+	enterRequestURL := "http://enterlb:8080/addrule"
 
-	// change the IP here
-	var requestURL string
-	switch lb {
-	case enterlb:
-		requestURL = "http://enterlb:8080/addrule"
-	case exitlb:
-		requestURL = "http://exitlb:8080/addrule"
-	}
+	exitRequestURL := "http://exitlb:8080/addrule"
 
 	jsonBody := []byte(ruleReqJson)
 
 	bodyReader := bytes.NewReader(jsonBody)
-	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+
+	enterReq, err := http.NewRequest(http.MethodPost, enterRequestURL, bodyReader)
 	if err != nil {
 		log.Errorf("client: could not create request: %s\n", err)
 	}
+	enterReq.Header.Set("Content-Type", "application/json")
 
-	req.Header.Set("Content-Type", "application/json")
+	exitReq, err := http.NewRequest(http.MethodPost, exitRequestURL, bodyReader)
+	if err != nil {
+		log.Errorf("client: could not create request: %s\n", err)
+	}
+	exitReq.Header.Set("Content-Type", "application/json")
 
+	go pConn.sendToLBer(enterReq)
+	go pConn.sendToLBer(exitReq)
+
+}
+
+func (pConn *PFCPConn) sendToLBer(req *http.Request) {
+	done := false
+	retries := uint8(0)
 	client := http.Client{
 		Timeout: 10 * time.Second,
 	}
-	done := false
-	for !done {
+	for !done && retries < pConn.upf.maxReqRetries {
 		resp, err := client.Do(req)
 		if err != nil {
 			log.Errorf("client: error making http request: %s\n", err)
@@ -145,7 +148,6 @@ func (pConn *PFCPConn) PushPDRInfo(addresses []uint32, lb lbtype) {
 		}
 		time.Sleep(1 * time.Second)
 	}
-
 }
 
 func (node *PFCPNode) RegisterTolb(lb lbtype) {
@@ -221,17 +223,10 @@ func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn, msgType
 			if _, ok := pConn.sentIpsToRouters[p.ueAddress]; !ok && !exists {
 				uEAddresses = append(uEAddresses, p.ueAddress)
 				pConn.sentIpsToRouters[p.ueAddress] = struct{}{}
-				//fseid := p.fseID
-				//for _, f := range session.fars {
-				//	if f.fseID == fseid {
-				//		teids = append(teids, f.tunnelTEID)
-				//	}
-				//}
+
 			}
 		}
-		//go PushPDRInfo(teids, uEAddresses)
-		pConn.PushPDRInfo(uEAddresses, enterlb)
-		pConn.PushPDRInfo(uEAddresses, exitlb)
+		pConn.PushPDRInfo(uEAddresses)
 	}
 	return nil
 }
