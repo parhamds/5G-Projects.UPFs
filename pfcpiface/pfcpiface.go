@@ -112,8 +112,8 @@ func (p *PFCPIface) Run() {
 	}()
 
 	http.HandleFunc("/registergw", RegisterGw)
-	server := http.Server{Addr: ":8081"}
-
+	server := http.Server{Addr: ":8082"}
+	log.Traceln("starting http server on 8082")
 	go server.ListenAndServe()
 
 	sig := make(chan os.Signal, 1)
