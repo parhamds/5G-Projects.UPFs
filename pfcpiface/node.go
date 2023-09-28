@@ -26,9 +26,11 @@ type PFCPNode struct {
 	// channel for PFCPConn to signal exit by sending their remote address
 	pConnDone chan string
 	// map of existing connections
-	pConns  sync.Map
-	gwIP    string
-	coreMac string
+	pConns    sync.Map
+	gwIP      string
+	coreMac   string
+	accessMac string
+	hostname  string
 	// upf
 	upf *upf
 	// metrics for PFCP messages and sessions
@@ -36,7 +38,7 @@ type PFCPNode struct {
 }
 
 // NewPFCPNode create a new PFCPNode listening on local address.
-func NewPFCPNode(upf *upf) *PFCPNode {
+func NewPFCPNode(upf *upf, conf *Conf) *PFCPNode {
 	conn, err := reuse.ListenPacket("udp", ":"+PFCPPort)
 	if err != nil {
 		log.Fatalln("ListenUDP failed", err)
@@ -58,7 +60,9 @@ func NewPFCPNode(upf *upf) *PFCPNode {
 		upf:        upf,
 		metrics:    metrics,
 		gwIP:       getExitLbInt(),
-		coreMac:    GetCoreMac(),
+		coreMac:    GetMac("core"),
+		accessMac:  GetMac("access"),
+		hostname:   conf.CPIface.NodeID,
 	}
 }
 

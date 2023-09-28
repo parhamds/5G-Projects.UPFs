@@ -51,8 +51,10 @@ type RuleReq struct {
 }
 
 type RegisterReq struct {
-	GwIP    string `json:"gwip"`
-	CoreMac string `json:"coremac"`
+	GwIP      string `json:"gwip"`
+	CoreMac   string `json:"coremac"`
+	AccessMac string `json:"accessmac,omitempty"`
+	Hostname  string `json:"hostname,omitempty"`
 }
 type lbtype int
 
@@ -159,10 +161,22 @@ func (pConn *PFCPConn) sendToLBer(req *http.Request) {
 func (node *PFCPNode) RegisterTolb(lb lbtype) {
 	gatewayIP := node.gwIP
 	coreMac := node.coreMac
-	registerReq := RegisterReq{
-		GwIP:    gatewayIP,
-		CoreMac: coreMac,
+	var registerReq RegisterReq
+	switch lb {
+	case enterlb:
+		registerReq = RegisterReq{
+			GwIP:      gatewayIP,
+			CoreMac:   coreMac,
+			AccessMac: node.accessMac,
+			Hostname:  node.hostname,
+		}
+	case exitlb:
+		registerReq = RegisterReq{
+			GwIP:    gatewayIP,
+			CoreMac: coreMac,
+		}
 	}
+
 	registerReqJson, _ := json.Marshal(registerReq)
 
 	fmt.Printf("parham log : json encoded pfcpInfo [%s] ", registerReqJson)

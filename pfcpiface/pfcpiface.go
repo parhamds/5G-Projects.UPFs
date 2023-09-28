@@ -73,7 +73,7 @@ func (p *PFCPIface) mustInit() {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	p.node = NewPFCPNode(p.upf)
+	p.node = NewPFCPNode(p.upf, &p.conf)
 	httpMux := http.NewServeMux()
 
 	setupConfigHandler(httpMux, p.upf)
@@ -251,8 +251,7 @@ func GetLocalIP() string {
 	return ""
 }
 
-func GetCoreMac() string {
-	interfaceName := "core" // Change this to the name of your interface.
+func GetMac(interfaceName string) string {
 
 	// Get the list of network interfaces.
 	ifaces, err := net.Interfaces()

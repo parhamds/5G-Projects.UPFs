@@ -5,9 +5,11 @@ package pfcpiface
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"math"
 	"net/http"
+	"os/exec"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -38,9 +40,71 @@ type ConfigHandler struct {
 	upf *upf
 }
 
+type RegisterGW struct {
+}
+
 func setupConfigHandler(mux *http.ServeMux, upf *upf) {
 	cfgHandler := ConfigHandler{upf: upf}
+	registerGW := RegisterGW{}
 	mux.Handle("/v1/config/network-slices", &cfgHandler)
+	mux.Handle("/registergw", &registerGW)
+}
+
+type GWRegisterReq struct {
+	GwIP  string `json:"gwip"`
+	GwMac string `json:"gwmac"`
+}
+
+func (registerGW *RegisterGW) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Infoln("handle http request for /registergw")
+
+	switch r.Method {
+	case "PUT":
+		fallthrough
+	case "POST":
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.Errorln("http req read body failed.")
+			sendHTTPResp(http.StatusBadRequest, w)
+		}
+
+		log.Traceln(string(body))
+
+		var registerReq GWRegisterReq
+
+		err = json.Unmarshal(body, &registerReq)
+		if err != nil {
+			log.Errorln("Json unmarshal failed for http request")
+			sendHTTPResp(http.StatusBadRequest, w)
+		}
+
+		err = handleRegisterGW(registerReq)
+		if err != nil {
+			log.Errorln("handle gw register req failed")
+			sendHTTPResp(http.StatusInternalServerError, w)
+		}
+		sendHTTPResp(http.StatusCreated, w)
+	default:
+		log.Infoln(w, "Sorry, only PUT and POST methods are supported.")
+		sendHTTPResp(http.StatusMethodNotAllowed, w)
+	}
+
+}
+
+func handleRegisterGW(registerReq GWRegisterReq) error {
+
+	var cmd *exec.Cmd
+
+	cmd = exec.Command("arp", "-s", registerReq.GwIP, registerReq.GwMac, "-i", "access")
+	combinedOutput, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("Error executing command: %v\nCombined Output: %s", cmd.String(), combinedOutput)
+		return err
+	}
+
+	log.Traceln("static arp applied successfully for ip : ", registerReq.GwIP)
+	return nil
+
 }
 
 func (c *ConfigHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
