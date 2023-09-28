@@ -111,7 +111,7 @@ func (p *PFCPIface) Run() {
 		log.Infoln("http server closed")
 	}()
 
-	http.HandleFunc("/register", RegisterGw)
+	http.HandleFunc("/registergw", RegisterGw)
 	server := http.Server{Addr: ":8081"}
 
 	go server.ListenAndServe()
