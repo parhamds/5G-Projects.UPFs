@@ -87,7 +87,7 @@ func (registerGw *RegisterGw) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		if registerReq.GwIP == registerGw.upf.gwIP {
 			go PushPFCPInfoNew(registerGw.upf)
 		}
-		go PushPFCPInfoNew(registerGw.upf)
+
 		sendHTTPResp(http.StatusCreated, w)
 	default:
 		log.Infoln(w, "Sorry, only PUT and POST methods are supported.")
