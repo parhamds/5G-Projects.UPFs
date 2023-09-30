@@ -6,7 +6,7 @@ package pfcpiface
 type SessionsStore interface {
 	// PutSession modifies the PFCP Session data indexed by a given F-SEID or
 	// inserts a new PFCP Session record, if it doesn't exist yet.
-	PutSession(session PFCPSession, pConn *PFCPConn, msgType uint8) error
+	PutSession(session PFCPSession, pConn *PFCPConn, pushPDR bool) error
 	// GetSession returns the PFCP Session data based on F-SEID.
 	GetSession(fseid uint64) (PFCPSession, bool)
 	// GetAllSessions returns all the PFCP Session records that are currently stored.

@@ -40,12 +40,13 @@ type ConfigHandler struct {
 	upf *upf
 }
 type RegisterGw struct {
+	upf *upf
 }
 
 func setupConfigHandler(mux *http.ServeMux, upf *upf) {
 	cfgHandler := ConfigHandler{upf: upf}
 	mux.Handle("/v1/config/network-slices", &cfgHandler)
-	registerGw := RegisterGw{}
+	registerGw := RegisterGw{upf: upf}
 	mux.Handle("/registergw", &registerGw)
 }
 
@@ -82,6 +83,7 @@ func (registerGw *RegisterGw) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			log.Errorln("handle gw register req failed")
 			sendHTTPResp(http.StatusInternalServerError, w)
 		}
+		go PushPFCPInfoNew(registerGw.upf)
 		sendHTTPResp(http.StatusCreated, w)
 	default:
 		log.Infoln(w, "Sorry, only PUT and POST methods are supported.")
