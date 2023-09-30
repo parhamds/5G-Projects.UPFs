@@ -182,6 +182,14 @@ func PushPFCPInfo(lAddr string) error {
 }
 
 func PushPFCPInfoNew(upf *upf) {
+	fmt.Println("waiting to register both Gateways")
+	for {
+		if upf.accessGwRegistered && upf.coreGwRegistered {
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
+	fmt.Println("registered both Gateways")
 	fmt.Println("upf info inside PushPFCPInfoNew :")
 	fmt.Println("dnn = ", upf.Dnn)
 	fmt.Println("AccessIP = ", upf.AccessIP)

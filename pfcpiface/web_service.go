@@ -10,6 +10,7 @@ import (
 	"math"
 	"net/http"
 	"os/exec"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -78,7 +79,7 @@ func (registerGw *RegisterGw) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			sendHTTPResp(http.StatusBadRequest, w)
 		}
 
-		err = handleRegisterGW(registerReq)
+		err = registerGw.handleRegisterGW(registerReq)
 		if err != nil {
 			log.Errorln("handle gw register req failed")
 			sendHTTPResp(http.StatusInternalServerError, w)
@@ -92,17 +93,40 @@ func (registerGw *RegisterGw) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 }
 
-func handleRegisterGW(registerReq GWRegisterReq) error {
+func (registerGw *RegisterGw) handleRegisterGW(registerReq GWRegisterReq) error {
 
 	var cmd *exec.Cmd
 
-	cmd = exec.Command("arp", "-s", registerReq.GwIP, registerReq.GwMac, "-i", "access")
+	reqGwOctets := strings.Split(registerReq.GwIP, ".")
+	reqThirdOctet := reqGwOctets[2]
+
+	accessGwOctets := strings.Split(registerGw.upf.AccessIP.String(), ".")
+	accessThirdOctet := accessGwOctets[2]
+
+	coreGwOctets := strings.Split(registerGw.upf.CoreIP.String(), ".")
+	coreThirdOctet := coreGwOctets[2]
+
+	var iface string
+
+	switch reqThirdOctet {
+	case accessThirdOctet:
+		iface = "access"
+	case coreThirdOctet:
+		iface = "core"
+	}
+
+	cmd = exec.Command("arp", "-s", registerReq.GwIP, registerReq.GwMac, "-i", iface)
 	combinedOutput, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Printf("Error executing command: %v\nCombined Output: %s", cmd.String(), combinedOutput)
 		return err
 	}
-
+	switch iface {
+	case "access":
+		registerGw.upf.accessGwRegistered = true
+	case "core":
+		registerGw.upf.coreGwRegistered = true
+	}
 	log.Traceln("static arp applied successfully for ip : ", registerReq.GwIP)
 	return nil
 

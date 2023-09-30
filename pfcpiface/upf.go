@@ -36,22 +36,24 @@ type UeResource struct {
 }
 
 type upf struct {
-	EnableUeIPAlloc   bool `json:"enableueipalloc"`
-	EnableEndMarker   bool `json:"enableendmarker"`
-	EnableFlowMeasure bool
-	accessIface       string
-	coreIface         string
-	ippoolCidr        string
-	AccessIP          net.IP `json:"accessip"`
-	CoreIP            net.IP `json:"coreip"`
-	NodeID            string `json:"nodeid"`
-	ippool            *IPPool
-	peers             []string
-	Dnn               string `json:"dnn"`
-	reportNotifyChan  chan uint64
-	sliceInfo         *SliceInfo
-	readTimeout       time.Duration
-	Hostname          string `json:"hostname"`
+	EnableUeIPAlloc    bool `json:"enableueipalloc"`
+	EnableEndMarker    bool `json:"enableendmarker"`
+	EnableFlowMeasure  bool
+	accessIface        string
+	coreIface          string
+	ippoolCidr         string
+	AccessIP           net.IP `json:"accessip"`
+	CoreIP             net.IP `json:"coreip"`
+	NodeID             string `json:"nodeid"`
+	ippool             *IPPool
+	peers              []string
+	accessGwRegistered bool
+	coreGwRegistered   bool
+	Dnn                string `json:"dnn"`
+	reportNotifyChan   chan uint64
+	sliceInfo          *SliceInfo
+	readTimeout        time.Duration
+	Hostname           string `json:"hostname"`
 	datapath
 	maxReqRetries uint8
 	respTimeout   time.Duration
