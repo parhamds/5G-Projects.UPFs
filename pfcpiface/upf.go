@@ -45,6 +45,7 @@ type upf struct {
 	AccessIP           net.IP `json:"accessip"`
 	CoreIP             net.IP `json:"coreip"`
 	NodeID             string `json:"nodeid"`
+	gwIP               string
 	ippool             *IPPool
 	peers              []string
 	accessGwRegistered bool

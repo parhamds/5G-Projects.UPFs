@@ -44,6 +44,9 @@ func NewPFCPNode(upf *upf, conf *Conf) *PFCPNode {
 		log.Fatalln("ListenUDP failed", err)
 	}
 
+	gwIp := getExitLbInt()
+	upf.gwIP = gwIp
+
 	metrics, err := metrics.NewPrometheusService()
 	if err != nil {
 		log.Fatalln("prom metrics service init failed", err)
@@ -59,7 +62,7 @@ func NewPFCPNode(upf *upf, conf *Conf) *PFCPNode {
 		pConnDone:  make(chan string, 100),
 		upf:        upf,
 		metrics:    metrics,
-		gwIP:       getExitLbInt(),
+		gwIP:       gwIp,
 		coreMac:    GetMac("core"),
 		accessMac:  GetMac("access"),
 		hostname:   conf.CPIface.NodeID,

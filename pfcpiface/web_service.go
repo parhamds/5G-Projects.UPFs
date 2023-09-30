@@ -84,6 +84,9 @@ func (registerGw *RegisterGw) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 			log.Errorln("handle gw register req failed")
 			sendHTTPResp(http.StatusInternalServerError, w)
 		}
+		if registerReq.GwIP == registerGw.upf.gwIP {
+			go PushPFCPInfoNew(registerGw.upf)
+		}
 		go PushPFCPInfoNew(registerGw.upf)
 		sendHTTPResp(http.StatusCreated, w)
 	default:
