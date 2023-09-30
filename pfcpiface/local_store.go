@@ -160,20 +160,12 @@ func (pConn *PFCPConn) sendToLBer(req *http.Request) {
 func (node *PFCPNode) RegisterTolb(lb lbtype) {
 	gatewayIP := node.gwIP
 	coreMac := node.coreMac
-	var registerReq RegisterReq
-	switch lb {
-	case enterlb:
-		registerReq = RegisterReq{
-			GwIP:      gatewayIP,
-			CoreMac:   coreMac,
-			AccessMac: node.accessMac,
-			Hostname:  node.hostname,
-		}
-	case exitlb:
-		registerReq = RegisterReq{
-			GwIP:    gatewayIP,
-			CoreMac: coreMac,
-		}
+
+	registerReq := RegisterReq{
+		GwIP:      gatewayIP,
+		CoreMac:   coreMac,
+		AccessMac: node.accessMac,
+		Hostname:  node.hostname,
 	}
 
 	registerReqJson, _ := json.Marshal(registerReq)
