@@ -131,8 +131,8 @@ func (pConn *PFCPConn) PushPDRInfo(addresses []uint32) {
 	}
 	exitReq.Header.Set("Content-Type", "application/json")
 
-	go pConn.sendToLBer(enterReq)
-	go pConn.sendToLBer(exitReq)
+	pConn.sendToLBer(enterReq)
+	pConn.sendToLBer(exitReq)
 
 }
 
@@ -221,23 +221,25 @@ func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn, pushPDR
 		"session": session,
 	}).Trace("Saved PFCP sessions to local store")
 	if pushPDR {
-		uEAddresses := make([]uint32, 0)
-		//teids := make([]uint32, 0)
-		for _, p := range session.pdrs {
-			exists := false
-			for _, u := range uEAddresses {
-				if u == p.ueAddress {
-					exists = true
-					break
+		go func(session *PFCPSession, pConn *PFCPConn) {
+			uEAddresses := make([]uint32, 0)
+			//teids := make([]uint32, 0)
+			for _, p := range session.pdrs {
+				exists := false
+				for _, u := range uEAddresses {
+					if u == p.ueAddress {
+						exists = true
+						break
+					}
+				}
+				if _, ok := pConn.sentIpsToRouters[p.ueAddress]; !ok && !exists {
+					uEAddresses = append(uEAddresses, p.ueAddress)
+					pConn.sentIpsToRouters[p.ueAddress] = struct{}{}
+
 				}
 			}
-			if _, ok := pConn.sentIpsToRouters[p.ueAddress]; !ok && !exists {
-				uEAddresses = append(uEAddresses, p.ueAddress)
-				pConn.sentIpsToRouters[p.ueAddress] = struct{}{}
-
-			}
-		}
-		pConn.PushPDRInfo(uEAddresses)
+			pConn.PushPDRInfo(uEAddresses)
+		}(&session, pConn)
 	}
 	return nil
 }
