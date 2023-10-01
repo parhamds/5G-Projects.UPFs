@@ -238,6 +238,7 @@ func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn, pushPDR
 
 				}
 			}
+			time.Sleep(2 * time.Second)
 			pConn.PushPDRInfo(uEAddresses)
 		}(&session, pConn)
 	}
