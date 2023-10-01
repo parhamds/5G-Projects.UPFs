@@ -14,6 +14,7 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/wmnsk/go-pfcp/message"
 )
 
 type InMemoryStore struct {
@@ -210,7 +211,7 @@ func (node *PFCPNode) RegisterTolb(lb lbtype) {
 
 }
 
-func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn, pushPDR bool) error {
+func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn, pushPDR bool, msgType uint8) error {
 	if session.localSEID == 0 {
 		return ErrInvalidArgument("session.localSEID", session.localSEID)
 	}
@@ -238,7 +239,9 @@ func (i *InMemoryStore) PutSession(session PFCPSession, pConn *PFCPConn, pushPDR
 
 				}
 			}
-			time.Sleep(2 * time.Second)
+			if msgType == message.MsgTypeSessionModificationRequest {
+				time.Sleep(2 * time.Second)
+			}
 			pConn.PushPDRInfo(uEAddresses)
 		}(&session, pConn)
 	}

@@ -143,7 +143,7 @@ func (pConn *PFCPConn) handleSessionEstablishmentRequest(msg message.Message) (m
 	if sereq.Header.MessagePriority != 123 {
 		pushPDR = true
 	}
-	err = pConn.store.PutSession(session, pConn, pushPDR)
+	err = pConn.store.PutSession(session, pConn, pushPDR, sereq.Header.Type)
 	if err != nil {
 		log.Errorf("Failed to put PFCP session to store: %v", err)
 	}
@@ -408,7 +408,7 @@ func (pConn *PFCPConn) handleSessionModificationRequest(msg message.Message) (me
 		pushPDR = true
 	}
 
-	err := pConn.store.PutSession(session, pConn, pushPDR)
+	err := pConn.store.PutSession(session, pConn, pushPDR, smreq.Header.Type)
 	if err != nil {
 		log.Errorf("Failed to put PFCP session to store: %v", err)
 	}
