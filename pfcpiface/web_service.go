@@ -124,23 +124,6 @@ func (registerGw *RegisterGw) handleRegisterGW(registerReq GWRegisterReq) error 
 		fmt.Printf("Error executing command: %v\nCombined Output: %s", cmd.String(), combinedOutput)
 		return err
 	}
-	accessGwip := fmt.Sprint("192.168.252.", reqGwOctets[3])
-	coreGwip := fmt.Sprint("192.168.250.", reqGwOctets[3])
-	addAccessRoute := exec.Command("ip", "route", "replace", "192.168.251.5", "via", accessGwip)
-	fmt.Println(addAccessRoute.String())
-	accesscombinedOutput, err := addAccessRoute.CombinedOutput()
-	if err != nil {
-		fmt.Printf("Error executing command: %v\nCombined Output: %s", cmd.String(), accesscombinedOutput)
-		return err
-	}
-
-	addCoreRoute := exec.Command("ip", "route", "replace", "192.168.251.10", "via", coreGwip)
-	corecombinedOutput, err := addCoreRoute.CombinedOutput()
-	if err != nil {
-		fmt.Printf("Error executing command: %v\nCombined Output: %s", cmd.String(), corecombinedOutput)
-		return err
-	}
-
 	switch iface {
 	case "access":
 		registerGw.upf.accessGwRegistered = true
