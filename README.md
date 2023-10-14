@@ -2,7 +2,7 @@
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# UPF
+# UPFs
 
 It basically is the [OMEC UPF](https://github.com/omec-project/upf), that I added some features to its PFCP-Agent container. 
 
