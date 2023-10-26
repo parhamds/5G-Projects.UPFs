@@ -60,6 +60,7 @@ type upf struct {
 	respTimeout   time.Duration
 	enableHBTimer bool
 	hbInterval    time.Duration
+	ueransim      bool
 }
 
 // to be replaced with go-pfcp structs
@@ -132,6 +133,7 @@ func NewUPF(conf *Conf, fp datapath) *upf {
 		enableHBTimer:     conf.EnableHBTimer,
 		readTimeout:       time.Second * time.Duration(conf.ReadTimeout),
 		Hostname:          conf.CPIface.NodeID,
+		ueransim:          conf.Ueransim,
 	}
 
 	if len(conf.CPIface.Peers) > 0 {

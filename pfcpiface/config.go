@@ -46,6 +46,7 @@ type Conf struct {
 	RespTimeout       string           `json:"resp_timeout"`
 	EnableHBTimer     bool             `json:"enable_hbTimer"`
 	HeartBeatInterval string           `json:"heart_beat_interval"`
+	Ueransim          bool             `json:"ueransim"`
 }
 
 // QciQosConfig : Qos configured attributes.
