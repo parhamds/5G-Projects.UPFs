@@ -13,6 +13,7 @@ It basically is the [OMEC UPF](https://github.com/omec-project/upf), that I adde
   * On every reception  of a PFCP Session Establishment Request, it sends the IP of associated UE to West-LB and East-LB
   * If the message priority of received PFCP message is equal to 123, it sends the IP of UE to West-LB and East-LB after handling the PFCP-Session Modification Request
   * PFCP port changed to 8806 
+  
 for more detail please see [Features Added to OMEC UPF](./Changes.md)
 
 
